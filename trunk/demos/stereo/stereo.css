@@ -1,0 +1,69 @@
+/* Stolen from the sample. */
+body {
+  font-family: arial; 
+}
+
+textarea {
+  padding: 6px;
+}
+
+form {
+  padding: 3px; 
+  background: #fafafa; 
+  margin-bottom: 0px; 
+  width: 100%
+}
+
+#eval_out {
+  margin-top: 3px; 
+  border: 1px solid silver; 
+  height: 200px; 
+  overflow: auto; 
+  background: white;
+  font-size: 9pt;
+}
+
+#samples {
+  margin-left: 8px; 
+  margin-right: 8px; 
+  padding: 4px; 
+  width: 280px;
+  overflow: auto;
+  height: 300px;
+  border: 1px solid #ddd;
+}
+
+.run_sample {
+  font-size: x-small;
+  float: right;
+}
+
+#map3d_container {
+  position: relative; 
+  border: 1px solid silver; 
+  height: 400px; 
+  width: 100%;
+}
+
+#map3d {  
+  height: 100%; 
+  width: 100%;
+  position: absolute; 
+  z-index: 10; 
+}
+
+#load_sample_label {  
+  font-weight: bold; 
+  margin-top: 4px;
+  
+}
+
+#toolbar {
+  font-size: 9pt;
+  float: right;
+  padding-top: 4px;
+}
+
+.toolbar_link {
+  margin-left: 8px;
+}
