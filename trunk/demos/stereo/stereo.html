@@ -52,11 +52,8 @@ function initCB1(object) {
   ge1.getWindow().setVisibility(true);
   showVersions(ge1);
   google.earth.addEventListener(ge1, "frameend", updateView1);
-  google.earth.addEventListener(ge2, "frameend", updateView2);
   google.earth.addEventListener(ge1.getWindow(), "mousedown", function (e) { 
       masterge = 1;});
-  google.earth.addEventListener(ge2.getWindow(), "mousedown", function (e) {
-      masterge = 2;});
 }
 
 function initCB2(object) {
@@ -66,6 +63,9 @@ function initCB2(object) {
     (elapsedStartupTime/1000) + 's';
   ge2 = object;
   ge2.getWindow().setVisibility(true);
+  google.earth.addEventListener(ge2, "frameend", updateView2);
+  google.earth.addEventListener(ge2.getWindow(), "mousedown", function (e) {
+      masterge = 2;});
   setTimeout(function() { ready_for_updates = true; }, 3000);
 }
 
@@ -137,7 +137,6 @@ updateView = function (master, slave) {
   setTimeout(function() { ready_for_updates = true; }, UPDATE_INTERVAL);
   var la = master.getView().copyAsLookAt(master.ALTITUDE_RELATIVE_TO_GROUND);
   if (slave != null) {
-    log("update view1");
     slave.getOptions().setFlyToSpeed(slave.SPEED_TELEPORT);
     var lookAtNew = slave.createLookAt('');
     // Try to grab the user preference for angle.  If none is available, use the
