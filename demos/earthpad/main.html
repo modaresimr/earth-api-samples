@@ -1,0 +1,901 @@
+<!--
+Copyright 2008 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+Author: Carl Nygaard
+-->
+<html>
+<head>
+  <title>Earth Pad - {{ doctitle|escape }}</title>
+
+  <script type="text/javascript"
+   src="http://www.google.com/jsapi?key={{ maps_api_key }}"></script>
+  <script type="text/javascript">
+
+
+// TODO(cnygaard): Internationalize strings.
+// TODO(cnygaard): Support unicode characters.
+
+
+// Useful library methods
+
+// Chunk found on XMLHttpRequest entry of wikipedia.
+function ajax(url, vars, callbackFunction)
+{
+  var request = window.XMLHttpRequest ?
+      new XMLHttpRequest() : new ActiveXObject("MSXML2.XMLHTTP.3.0");
+  request.open("POST", url, true);
+  request.setRequestHeader("Content-Type",
+                           "application/x-www-form-urlencoded"); 
+ 
+  request.onreadystatechange = function()
+  {
+    if (request.readyState == 4 && request.status == 200)
+    {
+      if (request.responseText)
+      {
+          callbackFunction(request.responseText);
+      }
+    }
+  };
+  request.send(vars);
+}
+
+
+// From: http://www.devarticles.com/c/a/JavaScript/JavaScript-and-XML/2/
+// Parse the XML document contained in the string argument and return
+// a Document object that represents it. Modified slightly for IE support.
+parseXML = function(text) {
+    if (typeof DOMParser != "undefined") {
+        // Mozilla, Firefox, and related browsers
+        return (new DOMParser()).parseFromString(text, "application/xml");
+    }
+    else if (typeof ActiveXObject != "undefined") {
+      // Internet Explorer.
+      var doc = new ActiveXObject("Microsoft.XMLDOM");
+      doc.async = "false";
+      doc.loadXML(text);
+      return doc;
+    }
+    else {
+        // As a last resort, try loading the document from a data: URL
+        // This is supposed to work in Safari. Thanks to Manos Batsis and
+        // his Sarissa library (sarissa.sourceforge.net) for this technique.
+        var url = "data:text/xml;charset=utf-8," + encodeURIComponent(text);
+        var request = new XMLHttpRequest();
+        request.open("GET", url, false);
+        request.send(null);
+        return request.responseXML;
+    }
+};
+
+
+serializeXML = function(node) {
+    if (typeof XMLSerializer != "undefined")
+        return (new XMLSerializer()).serializeToString(node) ;
+    else if (node.xml) return node.xml;
+    else throw "XML.serialize is not supported or can't serialize " + node;
+};
+
+
+// From http://www.bytemycode.com/snippets/snippet/406/
+String.prototype.escapeHTML = function () {
+  return (this.replace(/&/g, '&amp;').
+               replace(/>/g, '&gt;').
+               replace(/</g, '&lt;').
+               replace(/"/g, '&quot;'));
+}
+
+
+// Log a message to firebug, if it exists.
+log = function(msg) {
+  {% if not debug_mode %} {# some say console.logging is vulnerable #}
+    // Logging disabled in production.
+  {% else %}
+    if (typeof console != "undefined") {
+      // FF - Firebug
+      console.log(msg);
+    } else {
+      // FF w/o firebug or IE
+      el('debug_log').value += msg + '\n';
+    }
+  {% endif %}
+}
+
+
+// Initialization 
+
+google.load("earth", "1");
+google.load("maps", "2.99");  // For JS geocoder
+
+var ge = null;
+var geocoder;
+
+
+function el(e) { return document.getElementById(e); }
+
+
+function init() {
+  geocoder = new GClientGeocoder();
+  google.earth.createInstance("map3d", initCB, failureCB);
+}
+
+
+function initCB(object) {
+  ge = object;
+  ge.getWindow().setVisibility(true);
+
+  // Tell everyone that we've signed in.
+  setTimeout(function() {
+      sendMessageLogUpdate(' has joined!', false);
+    }, 200);
+
+  // Wait a bit before probing for updates.  If we don't wait, things
+  // may not be finished initailizing.
+  setTimeout(mainRequestLoop, 1000);
+}
+
+
+function failureCB(object) {
+  log('load failed');
+}
+
+
+function unload() {
+  // This is a non-robust way to make sure to post sign off messages.
+  // This could be improved on the server side by checking to see who is still
+  // probing for updates.
+  sendMessageLogUpdate(" has left.", false);
+  // TODO(cnygaard): It seems that as of some recent revision to the earht
+  // plugin, the ge object is destroyed before the unload call is made.
+  var container = ge.getGlobe().getFeatures();
+  var objectList = container.getChildNodes();
+  for (var i = 0; i < objectList.getLength(); ++i) {
+    container.removeChild(objectList.item(i));
+  }
+}
+
+
+// View manipulation
+
+
+// Performs a maps API search for the user provided location.
+function submitLocation() {
+  var address = el('address').value;
+  geocoder.getLatLng(address, function(point) {
+    log('point: ' + point);
+    if (point) {
+      if (ge != null) {
+        jumpToPoint(point.y, point.x);
+      }
+    }
+  });
+}
+
+
+// Warp to the given latitude and longitude point.  Very non-robust in that the
+// altitude etc are all fixed.
+jumpToPoint = function (lat, lon) {
+  log('Jumping to (' + lat + ', ' + lon + ')');
+  var la = ge.createLookAt('');
+  la.set(lat, lon, 99.99, ge.ALTITUDE_RELATIVE_TO_GROUND, 0, 0, 4000);
+  ge.getView().setAbstractView(la);
+}
+
+
+// Check that two float values are approximately the same.
+function nearlyEqual(a, b, tolerance, log_msg) {
+  result = Math.abs(a - b) <= tolerance;
+  //log(log_msg + ': ' + a + (result ? ' == ' : ' != ') + b);
+  return result;
+}
+
+
+// Compares two look ats to see if they are about the same
+areLookAtsTheSame = function (la1, la2) {
+  if(la1 == null || la2 == null) {
+    return false;
+  }
+  eps = 1.0e-3;
+  unbound_eps = 1.0e-2;
+  ran1 = la1.getRange();
+  ran2 = la2.getRange();
+  alt1 = la1.getAltitude();
+  alt2 = la2.getAltitude();
+  // TODO(cnygaard): Consider making tolerance of lat/lon based on range.
+  return (nearlyEqual(la1.getLatitude(), la2.getLatitude(), eps, 'lat') &&
+          nearlyEqual(la1.getLongitude(), la2.getLongitude(), eps, 'lon') &&
+          // Unbounded values, like altitude and range: must consider sigfigs.
+          nearlyEqual(ran1, ran2, unbound_eps * (ran1 + ran2) / 2, 'ran') &&
+          nearlyEqual(la1.getTilt(), la2.getTilt(), eps, 'til') &&
+          nearlyEqual(la1.getHeading(), la2.getHeading(), eps, 'hed') &&
+          nearlyEqual(alt1, alt2, unbound_eps * (alt1 + alt2) / 2, 'alt') &&
+          la1.getAltitudeMode() == la2.getAltitudeMode());
+}
+
+
+altitudeStringToMode = function(altmode) {
+  if(altmode == "clampToGround") {
+    return ge.ALTITUDE_CLAMP_TO_GROUND;
+  } else if(altmode == "relativeToGround") {
+    return ge.ALTITUDE_RELATIVE_TO_GROUND;
+  } else if(altmode == "absolute") {
+    return ge.ALTITUDE_ABSOLUTE;
+  }
+  return ge.ALTITUDE_RELATIVE_TO_GROUND;
+}
+
+
+// Update/Server interaction
+
+
+UPDATE_CHECK_INTERVAL = 3;  // seconds
+UPDATE_SEND_INTERVAL = 2;  
+UPDATE_CHECK_TIMEOUT = 20;  // seconds
+UPDATE_SEND_TIMEOUT = 20;
+
+// initialize this high so that we start off with an update check
+var seconds_since_last_update_check = UPDATE_CHECK_INTERVAL;
+var seconds_since_last_update_send = 0;
+
+var update_check_in_progress = false;
+var update_send_in_progress = false;
+
+// Each request is incrementally assigned a number to detect timeouts.
+var current_update_send_num = 0;
+var current_update_check_num = 0;
+
+// Stores the latest revision recieved by the server.
+var last_known_revision = -1;
+
+// Stores revisions that we have already affected locally and can ignore once we
+// receive them from the server.
+var revisions_to_ignore = new Array();
+
+// Stores the last view that either we sent to the server or the server told us
+// to change to.
+var last_saved_look_at = null;
+
+// Stores all of the placemark objects that have been added to earth by their
+// placemark ID so they may be refered to by the server's responses.
+var all_placemarks_by_id = new Array();
+
+// Used in debugging to pause the continual pinging.
+var pause_main_loop = false;
+pause = function () {
+  pause_main_loop = true;
+}
+
+
+// Every second this loop is executed, controlling update sending and receiving.
+mainRequestLoop = function() {
+  // In case this function dies for some reason, right away lets make sure it
+  // will restart in a second.
+  setTimeout(mainRequestLoop, 1000);
+
+  if (pause_main_loop) {
+    return;
+  }
+
+  ++seconds_since_last_update_check;
+  ++seconds_since_last_update_send;
+
+  if (!update_send_in_progress && !update_check_in_progress &&
+      seconds_since_last_update_check >= UPDATE_CHECK_INTERVAL) {
+    // Since we are not doing anything, check for updates.
+    update_check_in_progress = true;
+    // Make a timeout for the request
+    var last_update_check_num = ++current_update_check_num;
+    setTimeout(function () {
+        if (last_update_check_num == current_update_check_num) {
+          update_check_in_progress = false;
+        }
+      }, UPDATE_CHECK_TIMEOUT*1000);
+    checkForUpdates(function () {
+        if (last_update_check_num == current_update_check_num) {
+          seconds_since_last_update_check = 0;
+          update_check_in_progress = false;
+        }
+      });
+  } else if (!update_send_in_progress && !update_check_in_progress &&
+             seconds_since_last_update_send >= UPDATE_SEND_INTERVAL) {
+    // This type of "update send" is particular to sending an updated view.  We
+    // don't send updated views each time the user changes their view, less it
+    // overwelm the server.
+
+    update_send_in_progress = true;
+    // Make a timeout for the request
+    var last_update_send_num = ++current_update_send_num;
+    setTimeout(function () {
+        if (last_update_send_num == current_update_send_num) {
+          update_send_in_progress = false;
+        }
+      }, UPDATE_SEND_TIMEOUT*1000);
+    sendViewUpdate(function() {
+      if (last_update_send_num == current_update_send_num) {
+         seconds_since_last_update_send = 0;
+         update_send_in_progress = false;
+       }
+     });
+  }
+}
+
+
+// Once an update check has been recieved, it must be processed.  This method
+// says whether GE has finished updating.
+haveUpdatesCompletedInGE = function() {
+  // Get the current view
+  var la = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
+  return areLookAtsTheSame(la, last_saved_look_at);
+}
+
+
+// Store the last known revision we've seen from the server.
+setLastKnownRevision = function(new_value) {
+  log('Changing last_known_revision from ' + last_known_revision + ' to ' +
+      new_value + '.');
+  last_known_revision = new_value;
+}
+
+
+// Mark a revision as one that we should ignore once it comes back from the
+// server.  For example, if we are sending our view to the server, we should
+// ignore it when it comes back.
+addRevisionToIgnore = function(revision_num) {
+  revisions_to_ignore.push(revision_num);
+  // TODO(cnygaard): make a method that deletes obsolete items in
+  // revisions_to_ignore and figure out when to call it.
+}
+
+
+// Says whether they given revision number is one that we should not process
+// when it is provided by the server.
+isRevisionToIgnore = function(revision_num) {
+  for (var i = 0; i < revisions_to_ignore.length; ++i) {
+    if (revisions_to_ignore[i] == revision_num) {
+      return true;
+    }
+  }
+  return false;
+}
+
+
+// Query the server for any updates since we last checked for updates.
+checkForUpdates = function(checkCompleteCallBack) {
+  // Pass the last known revision to the server so it can decide what we 
+  // need to know.
+  ajax('/updatecheck', 'id={{ id }}&last_known_revision=' + last_known_revision,
+    function(response_text) {
+      // The response body is a custom XML string.  Parse it and process it.
+      var response_xml = parseXML(response_text);
+      ge_updated = false;
+      for (var h = 0; h < response_xml.childNodes.length; ++h) {
+        var first_level_child = response_xml.childNodes[h];
+        // TODO(cnygaard): Get rid of this meaningless KML wrapper.
+        if (!first_level_child.tagName || first_level_child.tagName != 'kml') {
+          continue;
+        }
+        for (var i = 0; i < first_level_child.childNodes.length; ++i) {
+          var second_level_child = first_level_child.childNodes[i];
+          if (!second_level_child.tagName) {
+            continue;
+          }
+          if (second_level_child.tagName == 'updatecheckresponse') {
+            rev_el = second_level_child.attributes.getNamedItem("status");
+            if (parseInt(rev_el.value) != 0) {
+              log('Error ' + rev_el.value + ' received from server!');
+            } else {
+              // Remember the latest global revision number.
+              rev_el = second_level_child.attributes.getNamedItem("revision");
+              setLastKnownRevision(parseInt(rev_el.value));
+            }
+          }
+          if (second_level_child.tagName == 'revision') {
+            nickname = (second_level_child.attributes.
+                getNamedItem("nickname").value);
+            revision_num =  parseInt(second_level_child.attributes.
+                                     getNamedItem("revision_number").value);
+            if (isRevisionToIgnore(revision_num)) {
+              continue;
+            }
+            for (var j = 0; j < second_level_child .childNodes.length; ++j) {
+              var element = second_level_child.childNodes[j];
+              if (!element.tagName) {
+                continue;
+              }
+              log('Processing tag: ' + element.tagName);
+              if (element.tagName.toLowerCase() == 'lookat') {
+                changeLastCameraModifier (nickname);
+                changeLookAtByXML(element);
+                ge_updated = true;
+              }
+              if (element.tagName.toLowerCase() == 'add_placemark') {
+                addPlacemarkByXML(element);
+              }
+              if (element.tagName.toLowerCase() == 'remove_placemark') {
+                removePlacemarkByXML(element);
+              }
+              if (element.tagName.toLowerCase() == 'message') {
+                msg = element.childNodes[0].nodeValue;
+                appendChatMessage(nickname, msg);
+              }
+              if (element.tagName.toLowerCase() == 'new_title') {
+                new_title = element.childNodes[0].nodeValue.escapeHTML();
+                el('title').innerHTML = new_title;
+                document.title = 'Earth Pad - ' + new_title;
+              }
+            }
+          }
+        }
+      }
+      TIMEOUT_WAITING_FOR_GE = 10000;
+      WAITING_FOR_GE_INTERVAL = 250;
+      waitForUpdatesToComleteInGE = function() {
+        if (haveUpdatesCompletedInGE()) {
+          log('GE completed succcessfully');
+          // If for some reason we didn't make it this far, the global update
+          // timeout will fix it eventually.
+          checkCompleteCallBack();
+        } else if (TIMEOUT_WAITING_FOR_GE <= 0) {
+          log('GE update timed out');
+          // Give up waiting
+          checkCompleteCallBack();
+        } else {
+          TIMEOUT_WAITING_FOR_GE -= WAITING_FOR_GE_INTERVAL;
+          setTimeout(waitForUpdatesToComleteInGE, WAITING_FOR_GE_INTERVAL);
+        }
+      }
+      if (ge_updated) {
+        log('Waiting for GE to finish changing the view...');
+        waitForUpdatesToComleteInGE();
+      } else {
+        log('No modifications made to GE -- update complete.');
+        checkCompleteCallBack();
+      }
+    });
+}
+
+
+// Change the indication of what user last changed the camera.
+changeLastCameraModifier = function(nickname) {
+  el('modifier').innerHTML = nickname;
+}
+
+
+// Given an XML look at element, update the current earth view.
+changeLookAtByXML = function(look_at_el) {
+
+  getval = function(key) {
+    for (var i = 0; i < look_at_el.childNodes.length; ++i) {
+      var component = look_at_el.childNodes[i];
+      if (component.tagName && component.tagName == key) {
+        if (component.firstChild) {
+          return component.firstChild.nodeValue;
+        } else {
+          // An empty node is the same as a blank string.
+          return '';
+        }
+      }
+    }
+    log('Warning: Not found: ' + key);
+    return null;
+  };
+
+  var la = ge.createLookAt('');
+  la.set(parseFloat(getval('latitude')),
+         parseFloat(getval('longitude')),
+         parseFloat(getval('altitude')),
+         altitudeStringToMode(getval('altitudeMode')),
+         parseFloat(getval('heading')),
+         parseFloat(getval('tilt')),
+         parseFloat(getval('range'))
+      );
+  ge.getView().setAbstractView(la);
+  last_saved_look_at = la;
+}
+
+
+// Create a placemark in Earth based on the contents of the given XML element.
+addPlacemarkByXML = function(node) {
+  getval = function(key) {
+    for (var i = 0; i < node.childNodes.length; ++i) {
+      var component = node.childNodes[i];
+      if (component.tagName && component.tagName == key) {
+        if (component.firstChild) {
+          return component.firstChild.nodeValue;
+        } else {
+          // An empty node is the same as a blank string.
+          return '';
+        }
+      }
+    }
+    log('Warning: Not found: ' + key);
+    return null;
+  };
+
+  var placemark = ge.createPlacemark('');
+  placemark.setStyleUrl( 
+    "root://styleMaps#default_copy0+" +
+    "nicon=http://maps.google.com/mapfiles/kml/paddle/red-circle.png+" +
+    "hicon=http://maps.google.com/mapfiles/kml/paddle/red-circle.png");
+
+  var point = ge.createPoint('');
+  placemark.setGeometry(point);
+  point.setLatitude(parseFloat(getval('latitude')));
+  point.setLongitude(parseFloat(getval('longitude')));
+  placemark.setName(getval('note').escapeHTML());
+  ge.getGlobe().getFeatures().appendChild(placemark);
+
+  placemark_id = parseInt(getval('placemark_id'));
+  log('Adding placemark: ' + placemark_id);
+  // Save the placemark so we can maipulated it later.
+  all_placemarks_by_id[placemarkIdToHash(placemark_id)] = placemark;
+  // TODO(cnygaard): Consider moving to the update check area.
+  repopulatePlacesList();
+}
+
+
+// A javascript array will treat an integer or even a string representation of
+// an integer as an index into an array, but we really just want a hash, so
+// force the integer to be a string by prepending text to it.
+placemarkIdToHash = function(id) {
+  return 'pm' + id;
+}
+
+
+// Performs the inverse of placemarkIdToHash.
+placemarkHashToId = function(hash) {
+  return hash.substr(2);
+}
+
+
+// Given an XML element that indicates that a placemark should be deleted,
+// delete the appropriate placemark.
+removePlacemarkByXML = function(node) {
+  placemark_id = parseInt(node.attributes.getNamedItem('placemark_id').value);
+  placemark = all_placemarks_by_id[placemarkIdToHash(placemark_id)];
+  if (typeof placemark == "undefined") {
+    log('Placemark ' + placemark_id + ' already removed!');
+    return;
+  }
+  // Remove from earth.
+  log('Removing placemark: ' + placemark_id + ' ' + placemark);
+
+  ge.getGlobe().getFeatures().removeChild(placemark);
+  // Remove from the list.
+  delete all_placemarks_by_id[placemarkIdToHash(placemark_id)];
+  // TODO(cnygaard): Consider moving to the update check area.
+  repopulatePlacesList();
+}
+
+
+// Loads all known places into the HTML div.
+repopulatePlacesList = function () {
+  html = '';
+  for (var placemark_id_hash in all_placemarks_by_id) {
+    placemark = all_placemarks_by_id[placemark_id_hash];
+    lat = placemark.getGeometry().getLatitude();
+    lon = placemark.getGeometry().getLongitude();
+    html += '<b style="font-size: 12pt;">' + placemark.getName() + '</b><br>';
+    html += '<a style="font-size: 10pt;" href="#" ';
+    html += 'onclick="jumpToPoint(' + lat + ', ' + lon + ');">jump to</a> - ';
+    html += '<a style="font-size: 10pt;" href="#" ';
+    html += ('onclick="sendDelPlacemarkUpdate(' + 
+             placemarkHashToId(placemark_id_hash));
+    html += ', \'' + placemark.getName() + '\');">delete</a><br><br>';
+  }
+  
+  el('placemarks').innerHTML = html;
+}
+
+
+// Adds the given message to the message log div.
+appendChatMessage = function(nickname, msg) {
+  el('chat_box').innerHTML += ('<b>' + nickname + '</b>' + 
+                               msg.escapeHTML() + '<br>\n');
+  // Trick to scroll to the end of the div taken from:
+  // www.webdeveloper.com/forum/archive/index.php/t-99391.html
+  setTimeout(function() {
+      el('chat_box').scrollTop = el('chat_box').scrollHeight}, 1);
+}
+
+
+// Called after any update is sent.  If log_revision is true, then the revision
+// is marked as one that should be ignored when sent back by the server.
+// Returns the revision number if the update was successful, -1 if not.
+processUpdateSendResponse = function(response_text, log_revision) {
+  var return_code = -1;
+  if (response_text != '') {
+    var response_xml = parseXML(response_text);
+    for (var i = 0; i < response_xml.childNodes.length; ++i) {
+      node = response_xml.childNodes[i];
+      if (node.tagName == 'updatesendresponse') {
+        rev_el = node.attributes.getNamedItem("status");
+        if (parseInt(rev_el.value) != 0) {
+          log('Update send error ' + rev_el.value + ' received from server!');
+        } else {
+          rev_el = node.attributes.getNamedItem("revision");
+          return_code = parseInt(rev_el.value);
+          if (log_revision) {
+            addRevisionToIgnore(return_code);
+          }
+        }
+      }
+    }
+  }
+  return return_code;
+}
+
+
+// Send an update to the server with the latest view in Earth, if the view has
+// changed.
+sendViewUpdate = function(finalizeSendCallBack) {
+  // Get the current view.
+  var la = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
+
+  if (areLookAtsTheSame(last_saved_look_at, la)) {
+    // View hasn't changed, so don't send the look at information.
+    log('view not changed, so not sending update.');
+    finalizeSendCallBack()
+    return;
+  }
+  log('view changed, so sending update.');
+  last_saved_look_at = la;
+
+  ajax('/updatesend',
+       'id={{ id }}&type=new_look_at&' +
+       'latitude=' + la.getLatitude() + '&' +
+       'longitude=' + la.getLongitude() + '&' +
+       'range=' + la.getRange() + '&' +
+       'tilt=' + la.getTilt() + '&' +
+       'heading=' + la.getHeading() + '&' +
+       'altitude=' + la.getAltitude() + '&' +
+       'altitude_mode=' + la.getAltitudeMode(),
+       function(response_text) {
+         changeLastCameraModifier('{{ nick }}');
+         processUpdateSendResponse(response_text, true);
+         finalizeSendCallBack();
+       });
+}
+
+
+// Send a new message log entry.
+// If post_instantly is true, the message is added immediately to the chat box
+// and the message is marked as a revision that should be ignored when the
+// server notifies us of the udpate. It is useful to set post_instantly to false
+// in situations where cronology might be confusing to the user -- for example
+// when first signing in.
+sendMessageLogUpdate = function(msg, post_instantly) {
+  log('Sending message: ' + msg);
+  ajax('/updatesend',
+       'id={{ id }}&type=message_log&msg=' + escape(msg),
+       function(response_text) {
+         // If we don't reach this point then we must have errored during the
+         // send.  If the server reports back that it accepted the update, then
+         // it is safe to append the chat message.  This will make things fast
+         // for the chat sender, but won't allow them to think they are
+         // successfully sending messages when they are not.  We could add more
+         // robust error handling to ajax requests (here and everywhere).
+         rev = processUpdateSendResponse(response_text, post_instantly);
+         // It may be possible for an update check to return with the newest
+         // revision before this callback could stop it from being processed,
+         // hence the check to make sure rev > last_known_revision.
+         if (rev != -1 && rev > last_known_revision && post_instantly) {
+           appendChatMessage("{{ nick }}", msg);
+         }
+       }
+       );
+}
+
+
+// Send an update to the server to add a new place.
+sendAddPlacemarkUpdate = function(lat, lon, note) {
+  log('Sending new placemark: ' + note);
+  ajax('/updatesend',
+       'id={{ id }}&type=add_placemark&note=' + escape(note) +
+       '&latitude=' + lat + '&longitude=' + lon,
+       function(response_text) {
+         // We rely on the server to propagate the placemark add, so don't mark
+         // the revision as ignorable.
+         processUpdateSendResponse(response_text, false);
+       });
+  sendMessageLogUpdate(' created a new place called "' + note + '".', false);
+}
+
+// Send an update to the server to delete a place.
+sendDelPlacemarkUpdate = function(placemark_id, name) {
+  if (!confirm('Really delete ' + name + '?')) {
+    return;
+  }
+  log('Removing placemark: ' + placemark_id);
+  ajax('/updatesend',
+       'id={{ id }}&type=remove_placemark&placemark_id=' + placemark_id,
+       function(response_text) {
+         // Again intentionally don't respond here.  The new placemark will be
+         // added through the server.  This probably won't result in pleasant
+         // error situations for the user...
+       });
+  sendMessageLogUpdate(' deleted the place called "' + name + '".', false);
+}
+
+// Change the title in the HTML.
+onChangeTitle = function() {
+  old_title = el('title').innerHTML
+  response = prompt('Enter a a new title.', old_title);
+  if (response == null || response == old_title) {
+    return;
+  }
+  sendNewTitleUpdate(response);
+  sendMessageLogUpdate(' changed the title to "' + response + '".', false);
+}
+
+
+// Send an update to the server to update the document's title.
+sendNewTitleUpdate = function(title) {
+  log('Sending new title: ' + title);
+  ajax('/updatesend',
+       'id={{ id }}&type=new_title&title=' + escape(title),
+       function(response_text) {
+         // We rely on the server to propagate the title, so don't mark
+         // the revision as ignorable.
+         processUpdateSendResponse(response_text, false);
+       });
+}
+
+
+// Response to the chat submission button.
+onSubmitChat = function() {
+  msg = el('chatsendtext').value;
+  el('chatsendtext').value = '';
+  sendMessageLogUpdate(': ' + msg, true);
+}
+
+
+// The various modes of interaction with GE.
+var MOVING_CAMERA = 0;
+var ADDING_PLACEMARK = 1;
+
+var interaction_state = MOVING_CAMERA;
+var original_add_placemark_text = null;
+
+
+// Reaction to the user click on the "Add Place!" button.
+// A simple state machine is used to remember what is currently happening.
+onClickAddPlaceMark = function() {
+  var event_modifier = null;
+  pm_el = el('add_placemark');
+  if (interaction_state == MOVING_CAMERA) {
+    event_modifier = google.earth.addEventListener;
+    original_add_placemark_text = pm_el.innerHTML;
+    pm_el.innerHTML = 'Now click the earth!<br>(click here to cancel)';
+    interaction_state = ADDING_PLACEMARK;
+  } else if (interaction_state == ADDING_PLACEMARK) {
+    event_modifier = google.earth.removeEventListener;
+    pm_el.innerHTML = original_add_placemark_text;
+    interaction_state = MOVING_CAMERA;
+  } else {
+    // Should not be reached.
+    return;
+  }
+  event_modifier(ge.getGlobe(), "mousedown", onEarthAddPlaceMarkClick);
+}
+
+
+// Handler for user clicks while in the ADDING_PLACEMARK state.
+onEarthAddPlaceMarkClick = function(event) {
+  response = prompt('Enter a name for this Place.', '');
+  // Close out the listener and reset the state of the add link.
+  onClickAddPlaceMark();
+  if (response == null) {
+    // The user canceled the prompt.
+    return;
+  }
+  sendAddPlacemarkUpdate(event.getLatitude(), event.getLongitude(), response);
+}
+  </script>
+</head>
+<body style="font-family: arial;"
+ onload='init()' onunload='unload();google.maps.Unload()' id='body'>
+  <style type="text/css">
+    <!--
+    div.scroll {
+    height: 170px;
+    width: 95%;
+    overflow: auto;
+    border: 1px solid #666;
+    background-color: #ccf;
+    padding: 8px;
+    color: #33a;
+    }
+    -->
+  </style>
+  {% if debug_mode %}
+  <div>
+    <a style="font-size: 8pt;" href='http://earthpad.appspot.com'>You are viewing the debug version of Earth Pad.  Click here to go to the external site.</a>
+  </div>
+  {% endif %}
+  <div>
+    <table border=0 width=100%>
+      <tr><td width=60%>
+          Earth Pad - <b id="title" name="title">{{ doctitle|escape }}</b>
+          <a style="font-size: 8pt;" href='#' onclick='onChangeTitle();'
+            id=change_title name=change_title>Rename</a>
+          <a style="font-size: 8pt;" href='/' >Create a new pad</a><br/>
+          Invite others with this link: <a href="{{ docurl }}">{{ docurl }}</a>
+      </td><td align="right" valign="bottom" width=40%>
+        <form name='searchform' id='searchform'
+          action='javascript:submitLocation();void(0);'>
+          <input type=text size=20 id='address'></input>
+          <input type=submit value='Go to location'>
+        </form>
+      </td></tr>
+    </table>
+  </div>
+
+  <table height=400 width=100%>
+    <tr><td width=* >
+      <div id='map3d_container'
+       style='border: 1px solid silver; width: 100%; height: 400px;'>
+        <div id='map3d' style='height: 100%;'></div>
+      </div>
+    </td><td valign=top width=150 style='background-color: #ccf; color: #33a'>
+        <b>Places:</b>
+        <div class=scroll style="width: 140px; height: 350px;"
+         id=placemarks name=placemarks>&nbsp;
+        </div>
+        <div align=center valign=bottom>
+          <a href='#' onclick='onClickAddPlaceMark();'
+           id=add_placemark name=add_placemark >Add a Place!</a>
+        </div>
+  </td></tr>
+</table>
+
+  <div>
+    <font color=blue><b id='modifier' name='modifier'>no one</b></font>
+    last changed the camera.
+  </div>
+  <div>
+    <form name='chatsendform' id='chatsendform'
+     action='javascript:onSubmitChat();void(0);'>
+      <input maxlength=400 type=text size=60 id='chatsendtext'></input>
+      <input type=submit value='Send Chat'>
+    </form>
+  </div>
+  <div><table width=100% padding=0>
+    <tr><td width='*'>
+      <div class=scroll id="chat_box" name="chat_box">&nbsp;</div>
+    </td><td width=190>
+      <div class=scroll id="recent_changes" name="recent_changes">
+        <font color=red style='font-size: 10pt;'>
+        <b>Earth Pad FAQs:</b><p>
+        - <i>What is Earth Pad?</i><br>
+        A collaborative way to use Google Earth Plugin.<br><br>
+        - <i>Are the places I post public?</i><br>
+        <b>Yes!</b> Please do not store any information that should not be
+        posted publically.  Later versions may add improved security.<br><br>
+        - <i>Where can I get the source code?</i><br>
+        <a href="http://code.google.com/p/earth-api-samples/">Right here!</a>
+    </font>
+    </div></td></tr>
+  </table></div>
+  {% if debug_mode %}
+    Debug log:
+    <textarea cols=110 rows=8 id='debug_log'></textarea>
+  {% endif %}
+  <br>
+  <img src="http://code.google.com/appengine/images/appengine-silver-120x30.gif"
+   alt="Powered by Google App Engine" />
+</body>
+</html>
