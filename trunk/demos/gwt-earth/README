@@ -1,0 +1,8 @@
+*******************************************************************************
+A simple demo to show how Google Web Toolkit can be integrated with Google
+Earth API for easy web development.
+
+*******************************************************************************
+Eclipse project files are not provided because paths are hard-coded.
+Just create a new project using gwt, copy the sources and import them using
+Eclipse.
