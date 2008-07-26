@@ -1,0 +1,145 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+  <title>Google Earth API Samples - Creating LineStrings</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <style type="text/css">@import "static/examples.css";</style>
+  <style type="text/css">@import "static/dp.SyntaxHighlighter/Styles/SyntaxHighlighter.css";</style>
+  <script type="text/javascript" src="static/dp.SyntaxHighlighter/Scripts/shCore.js"></script>
+  <script type="text/javascript" src="static/dp.SyntaxHighlighter/Scripts/shBrushJScript.js"></script>
+  <script type="text/javascript" src="http://www.google.com/jsapi?hl=en&key=ABQIAAAAKkfkHb2nXsD0o1OX2TbdkRTZdFmpiU8vv3PBIA-hr88t-5BzzxQjEeEmKaZUy66ADwTlY8x2M14hHg"></script>
+  <script type="text/javascript">
+  /* <![CDATA[ */
+  var ge;
+  google.load("earth", "1");
+
+  function init() {
+    google.earth.createInstance('map3d', initCB, failureCB);
+  }
+  
+  function initCB(instance) {
+    ge = instance;
+    ge.getWindow().setVisibility(true);
+    
+    // add a navigation control
+    ge.getNavigationControl().setVisibility(ge.VISIBILITY_AUTO);
+    
+    // add some layers
+    ge.getLayerRoot().enableLayerById(ge.LAYER_BORDERS, true);
+    ge.getLayerRoot().enableLayerById(ge.LAYER_ROADS, true);
+
+    var la = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
+    la.setRange(1000000);
+    ge.getView().setAbstractView(la);
+    
+    createLinestring();
+    
+  }
+  
+  function failureCB() {
+    alert('Google earth loading failed!');
+  }
+  
+  function createLinestring() {
+    function addToLineString(lineString, lat, lng, latOffset, lngOffset) {
+      var altitude = 1.0; // give it some altitude
+      lineString.getCoordinates().
+        pushLatLngAlt(lat + latOffset, lng + lngOffset, altitude);
+    }
+  
+    var lookAt = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
+    var lat = lookAt.getLatitude();
+    var lng = lookAt.getLongitude();
+  
+    // create the line string placemark
+    var lineStringPlacemark = ge.createPlacemark('');
+    
+    // create the line string geometry
+    var lineString = ge.createLineString('');
+    lineStringPlacemark.setGeometry(lineString);
+    
+    // tessellate (i.e. conform to ground elevation)
+    lineString.setTessellate(true);
+  
+    // add the the points to the line string geometry
+    addToLineString(lineString, lat, lng,   0,   0, 0);
+    addToLineString(lineString, lat, lng, 1.5,  .5, 0);
+    addToLineString(lineString, lat, lng,   0, 1.0, 0);
+    addToLineString(lineString, lat, lng, 1.5, 1.5, 0);
+    addToLineString(lineString, lat, lng,   0, 2.0, 0);
+    addToLineString(lineString, lat, lng, 1.5, 2.5, 0);
+    addToLineString(lineString, lat, lng,   0, 3.0, 0);
+    addToLineString(lineString, lat, lng, 1.5, 3.5, 0);
+    addToLineString(lineString, lat, lng,   0, 4.0, 0);
+    addToLineString(lineString, lat, lng, 1.5, 4.5, 0);
+  
+    ge.getFeatures().appendChild(lineStringPlacemark);
+  }
+  
+  function buttonClick() {
+    createLinestring();
+  }
+  
+  /* ]]> */
+  </script>
+</head>
+<body onload="init();">
+  <h1>Google Earth API Samples - Creating LineStrings</h1>
+  <dl>
+            <dt>Last Modified:</dt><dd>07/25/08</dd>
+  </dl>
+  <div style="clear: both;"></div>
+  
+  <div id="ui" style="position: relative;">
+    <div id="map3d_container" style="border: 1px solid #000; width: 500px; height: 500px;">
+      <div id="map3d" style="height: 100%;"></div>
+    </div>
+  
+    <div id="extra-ui" style="position: absolute; left: 520px; top: 0;">
+      <input type="button" onclick="buttonClick()" value="Create Another LineString!"/>
+      
+      <h2>Relevant Code Excerpt:</h2>
+      <pre name="code" class="jscript">
+  function addToLineString(lineString, lat, lng, latOffset, lngOffset) {
+    var altitude = 1.0; // give it some altitude
+    lineString.getCoordinates().
+      pushLatLngAlt(lat + latOffset, lng + lngOffset, altitude);
+  }
+
+  var lookAt = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
+  var lat = lookAt.getLatitude();
+  var lng = lookAt.getLongitude();
+
+  // create the line string placemark
+  var lineStringPlacemark = ge.createPlacemark('');
+  
+  // create the line string geometry
+  var lineString = ge.createLineString('');
+  lineStringPlacemark.setGeometry(lineString);
+  
+  // tessellate (i.e. conform to ground elevation)
+  lineString.setTessellate(true);
+
+  // add the the points to the line string geometry
+  addToLineString(lineString, lat, lng,   0,   0, 0);
+  addToLineString(lineString, lat, lng, 1.5,  .5, 0);
+  addToLineString(lineString, lat, lng,   0, 1.0, 0);
+  addToLineString(lineString, lat, lng, 1.5, 1.5, 0);
+  addToLineString(lineString, lat, lng,   0, 2.0, 0);
+  addToLineString(lineString, lat, lng, 1.5, 2.5, 0);
+  addToLineString(lineString, lat, lng,   0, 3.0, 0);
+  addToLineString(lineString, lat, lng, 1.5, 3.5, 0);
+  addToLineString(lineString, lat, lng,   0, 4.0, 0);
+  addToLineString(lineString, lat, lng, 1.5, 4.5, 0);
+
+  ge.getFeatures().appendChild(lineStringPlacemark);
+      </pre>
+    </div>
+  </div>
+  <script type="text/javascript">
+  dp.SyntaxHighlighter.ClipboardSwf = 'dp.SyntaxHighlighter/Scripts/clipboard.swf';
+  dp.SyntaxHighlighter.HighlightAll('code');
+  </script>
+</body>
+</html>

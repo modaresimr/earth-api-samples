@@ -1,0 +1,148 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+  <title>Google Earth API Samples - Changing Balloon Content</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <style type="text/css">@import "static/examples.css";</style>
+  <style type="text/css">@import "static/dp.SyntaxHighlighter/Styles/SyntaxHighlighter.css";</style>
+  <script type="text/javascript" src="static/dp.SyntaxHighlighter/Scripts/shCore.js"></script>
+  <script type="text/javascript" src="static/dp.SyntaxHighlighter/Scripts/shBrushJScript.js"></script>
+  <script type="text/javascript" src="http://www.google.com/jsapi?hl=en&key=ABQIAAAAKkfkHb2nXsD0o1OX2TbdkRTZdFmpiU8vv3PBIA-hr88t-5BzzxQjEeEmKaZUy66ADwTlY8x2M14hHg"></script>
+  <script type="text/javascript">
+  /* <![CDATA[ */
+  var ge;
+  var placemark;
+  
+  google.load("earth", "1");
+
+  function init() {
+    google.earth.createInstance('map3d', initCB, failureCB);
+  }
+  
+  function initCB(instance) {
+    ge = instance;
+    ge.getWindow().setVisibility(true);
+    
+    // add a navigation control
+    ge.getNavigationControl().setVisibility(ge.VISIBILITY_AUTO);
+    
+    // add some layers
+    ge.getLayerRoot().enableLayerById(ge.LAYER_BORDERS, true);
+    ge.getLayerRoot().enableLayerById(ge.LAYER_ROADS, true);
+
+    // create the placemark
+    placemark = ge.createPlacemark('');
+    
+    var point = ge.createPoint('');
+    point.setLatitude(37);
+    point.setLongitude(-122);
+    placemark.setGeometry(point);
+    
+    // add the placemark to the earth DOM
+    ge.getFeatures().appendChild(placemark);
+    
+    // look at the placemark we created
+    var la = ge.createLookAt('');
+    la.set(37, -122,
+      0, // altitude
+      ge.ALTITUDE_RELATIVE_TO_GROUND,
+      0, // heading
+      0, // straight-down tilt
+      5000 // range (inverse of zoom)
+      );
+    ge.getView().setAbstractView(la);
+    
+  }
+  
+  function failureCB() {
+    alert('Google earth loading failed!');
+  }
+  
+  function buttonClick1() {
+    var balloon = ge.createHtmlStringBalloon('');
+    balloon.setFeature(placemark); // optional
+    balloon.setMaxWidth(300);
+    
+    // Google logo.
+    balloon.setContentString(
+        '<img src="http://www.google.com/intl/en_ALL/images/logo.gif"><br>'
+        + '<font size=20>Earth Plugin</font><br><font size=-2>sample info '
+        + 'window</font>');
+    
+    ge.setBalloon(balloon);
+  }
+  
+  function buttonClick2() {
+    // Change the context of the current balloon.
+    var balloon = ge.getBalloon();
+    if (balloon) {
+      // Pigeon Rank
+      var content = 
+        '<img src="http://www.google.com/technology/pigeon_system.jpg">' +
+        '<br>PigeonRank&#153; Technology';
+      balloon.setFeature(placemark); // optional
+      balloon.setMaxWidth(800);
+      
+      if (balloon.getType() == 'GEHtmlStringBalloon') {
+        balloon.setContentString(content);
+      } else if (balloon.getType() == 'GEHtmlDivBalloon') {
+        var div = document.createElement('DIV');
+        div.innerHTML = content;
+        balloon.setContentDiv(div);
+      } else if (balloon.getType() == 'GEFeatureBalloon') {
+        placemark.setDescription(content);
+      }
+    }
+  }
+  
+  /* ]]> */
+  </script>
+</head>
+<body onload="init();">
+  <h1>Google Earth API Samples - Changing Balloon Content</h1>
+  <dl>
+            <dt>Last Modified:</dt><dd>07/25/08</dd>
+  </dl>
+  <div style="clear: both;"></div>
+  
+  <div id="ui" style="position: relative;">
+    <div id="map3d_container" style="border: 1px solid #000; width: 500px; height: 500px;">
+      <div id="map3d" style="height: 100%;"></div>
+    </div>
+  
+    <div id="extra-ui" style="position: absolute; left: 520px; top: 0;">
+      <input type="button" onclick="buttonClick1()" value="Show a Balloon!"/><br/>
+      <input type="button" onclick="buttonClick2()" value="Change its Content!"/><br/>
+      
+      <h2>Relevant Code Excerpt:</h2>
+      <pre name="code" class="jscript">
+  // Change the context of the current balloon.
+  var balloon = ge.getBalloon();
+  if (balloon) {
+    // Pigeon Rank
+    var content = 
+      '&lt;img src=&quot;http://www.google.com/technology/pigeon_system.jpg&quot;&gt;' +
+      '&lt;br&gt;PigeonRank&amp;#153; Technology';
+    balloon.setFeature(placemark); // optional
+    balloon.setMaxWidth(800);
+    
+    if (balloon.getType() == 'GEHtmlStringBalloon') {
+      balloon.setContentString(content);
+    } else if (balloon.getType() == 'GEHtmlDivBalloon') {
+      var div = document.createElement('DIV');
+      div.innerHTML = content;
+      balloon.setContentDiv(div);
+    } else if (balloon.getType() == 'GEFeatureBalloon') {
+      placemark.setDescription(content);
+    }
+  }
+      </pre>
+    </div>
+  </div>
+  <script type="text/javascript">
+  dp.SyntaxHighlighter.ClipboardSwf = 'dp.SyntaxHighlighter/Scripts/clipboard.swf';
+  dp.SyntaxHighlighter.HighlightAll('code');
+  </script>
+</body>
+</html>

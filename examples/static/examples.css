@@ -1,0 +1,40 @@
+@media screen {
+  * { font-family: arial, helvetica, sans-serif; }
+  
+  h1 {
+    font-size: 16pt;
+    font-weight: bold;
+  }
+  
+  h2 {
+    font-size: 12pt;
+    font-weight: bold;
+  }
+  
+  dl {
+    clear: both;
+  }
+  
+  dt {
+    font-size: small;
+    font-weight: bold;
+    
+    float: left;
+    width: 10em;
+    clear: both;
+  }
+  
+  dd {
+    font-size: small;
+    float: left;
+    width: 20em;
+  }
+  
+  dt, dd {
+    padding-bottom: 1em;
+  }
+  
+  .dp-c li span {
+    font-family: monospace;
+  }
+}

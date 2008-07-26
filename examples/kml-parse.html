@@ -1,0 +1,153 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+  <title>Google Earth API Samples - Parse KML</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <style type="text/css">@import "static/examples.css";</style>
+  <style type="text/css">@import "static/dp.SyntaxHighlighter/Styles/SyntaxHighlighter.css";</style>
+  <script type="text/javascript" src="static/dp.SyntaxHighlighter/Scripts/shCore.js"></script>
+  <script type="text/javascript" src="static/dp.SyntaxHighlighter/Scripts/shBrushJScript.js"></script>
+  <script type="text/javascript" src="http://www.google.com/jsapi?hl=en&key=ABQIAAAAKkfkHb2nXsD0o1OX2TbdkRTZdFmpiU8vv3PBIA-hr88t-5BzzxQjEeEmKaZUy66ADwTlY8x2M14hHg"></script>
+  <script type="text/javascript">
+  /* <![CDATA[ */
+  var ge;
+  google.load("earth", "1");
+
+  function init() {
+    google.earth.createInstance('map3d', initCB, failureCB);
+  }
+  
+  function initCB(instance) {
+    ge = instance;
+    ge.getWindow().setVisibility(true);
+    
+    // add a navigation control
+    ge.getNavigationControl().setVisibility(ge.VISIBILITY_AUTO);
+    
+    // add some layers
+    ge.getLayerRoot().enableLayerById(ge.LAYER_BORDERS, true);
+    ge.getLayerRoot().enableLayerById(ge.LAYER_ROADS, true);
+
+    // Sample KML taken from 
+    //   http://code.google.com/apis/kml/documentation/kml_tut.html#polygons
+    var pentagon = ge.parseKml(
+      '<?xml version="1.0" encoding="UTF-8"?>' +
+      '<kml xmlns="http://earth.google.com/kml/2.1">' +
+      '  <Placemark>' +
+      '    <name>The Pentagon</name>' +
+      '    <Polygon>' +
+      '      <extrude>1</extrude>' +
+      '      <altitudeMode>relativeToGround</altitudeMode>' +
+      '      <outerBoundaryIs>' +
+      '        <LinearRing>' +
+      '          <coordinates>' +
+      '            -77.05788457660967,38.87253259892824,100 ' +
+      '            -77.05465973756702,38.87291016281703,100 ' +
+      '            -77.05315536854791,38.87053267794386,100 ' +
+      '            -77.05552622493516,38.868757801256,100 ' +
+      '            -77.05844056290393,38.86996206506943,100 ' +
+      '            -77.05788457660967,38.87253259892824,100' +
+      '          </coordinates>' +
+      '        </LinearRing>' +
+      '      </outerBoundaryIs>' +
+      '      <innerBoundaryIs>' +
+      '        <LinearRing>' +
+      '          <coordinates>' +
+      '            -77.05668055019126,38.87154239798456,100 ' +
+      '            -77.05542625960818,38.87167890344077,100 ' +
+      '            -77.05485125901024,38.87076535397792,100 ' +
+      '            -77.05577677433152,38.87008686581446,100 ' +
+      '            -77.05691162017543,38.87054446963351,100 ' +
+      '            -77.05668055019126,38.87154239798456,100' +
+      '          </coordinates>' +
+      '        </LinearRing>' +
+      '      </innerBoundaryIs>' +
+      '    </Polygon>' +
+      '  </Placemark>' +
+      '</kml>');
+    
+    ge.getFeatures().appendChild(pentagon);
+    
+    // Fly to the Pentagon
+    var la = ge.createLookAt('');
+    la.set(38.867, -77.0565, 500, ge.ALTITUDE_RELATIVE_TO_GROUND, 0, 45, 900);
+    ge.getView().setAbstractView(la);
+    
+  }
+  
+  function failureCB() {
+    alert('Google earth loading failed!');
+  }
+  
+  /* ]]> */
+  </script>
+</head>
+<body onload="init();">
+  <h1>Google Earth API Samples - Parse KML</h1>
+  <dl>
+            <dt>Last Modified:</dt><dd>07/25/08</dd>
+  </dl>
+  <div style="clear: both;"></div>
+  
+  <div id="ui" style="position: relative;">
+    <div id="map3d_container" style="border: 1px solid #000; width: 500px; height: 500px;">
+      <div id="map3d" style="height: 100%;"></div>
+    </div>
+  
+    <div id="extra-ui" style="position: absolute; left: 520px; top: 0;">
+      <h2>Relevant Code Excerpt:</h2>
+      <pre name="code" class="jscript">
+// Sample KML taken from 
+//   http://code.google.com/apis/kml/documentation/kml_tut.html#polygons
+var pentagon = ge.parseKml(
+  '&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;' +
+  '&lt;kml xmlns=&quot;http://earth.google.com/kml/2.1&quot;&gt;' +
+  '  &lt;Placemark&gt;' +
+  '    &lt;name&gt;The Pentagon&lt;/name&gt;' +
+  '    &lt;Polygon&gt;' +
+  '      &lt;extrude&gt;1&lt;/extrude&gt;' +
+  '      &lt;altitudeMode&gt;relativeToGround&lt;/altitudeMode&gt;' +
+  '      &lt;outerBoundaryIs&gt;' +
+  '        &lt;LinearRing&gt;' +
+  '          &lt;coordinates&gt;' +
+  '            -77.05788457660967,38.87253259892824,100 ' +
+  '            -77.05465973756702,38.87291016281703,100 ' +
+  '            -77.05315536854791,38.87053267794386,100 ' +
+  '            -77.05552622493516,38.868757801256,100 ' +
+  '            -77.05844056290393,38.86996206506943,100 ' +
+  '            -77.05788457660967,38.87253259892824,100' +
+  '          &lt;/coordinates&gt;' +
+  '        &lt;/LinearRing&gt;' +
+  '      &lt;/outerBoundaryIs&gt;' +
+  '      &lt;innerBoundaryIs&gt;' +
+  '        &lt;LinearRing&gt;' +
+  '          &lt;coordinates&gt;' +
+  '            -77.05668055019126,38.87154239798456,100 ' +
+  '            -77.05542625960818,38.87167890344077,100 ' +
+  '            -77.05485125901024,38.87076535397792,100 ' +
+  '            -77.05577677433152,38.87008686581446,100 ' +
+  '            -77.05691162017543,38.87054446963351,100 ' +
+  '            -77.05668055019126,38.87154239798456,100' +
+  '          &lt;/coordinates&gt;' +
+  '        &lt;/LinearRing&gt;' +
+  '      &lt;/innerBoundaryIs&gt;' +
+  '    &lt;/Polygon&gt;' +
+  '  &lt;/Placemark&gt;' +
+  '&lt;/kml&gt;');
+
+ge.getFeatures().appendChild(pentagon);
+
+// Fly to the Pentagon
+var la = ge.createLookAt('');
+la.set(38.867, -77.0565, 500, ge.ALTITUDE_RELATIVE_TO_GROUND, 0, 45, 900);
+ge.getView().setAbstractView(la);
+      </pre>
+    </div>
+  </div>
+  <script type="text/javascript">
+  dp.SyntaxHighlighter.ClipboardSwf = 'dp.SyntaxHighlighter/Scripts/clipboard.swf';
+  dp.SyntaxHighlighter.HighlightAll('code');
+  </script>
+</body>
+</html>
