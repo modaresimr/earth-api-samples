@@ -1,0 +1,77 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+  <title>Google Earth API Samples - Move Camera</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <style type="text/css">@import "static/examples.css";</style>
+  <style type="text/css">@import "static/dp.SyntaxHighlighter/Styles/SyntaxHighlighter.css";</style>
+  <script type="text/javascript" src="static/dp.SyntaxHighlighter/Scripts/shCore.js"></script>
+  <script type="text/javascript" src="static/dp.SyntaxHighlighter/Scripts/shBrushJScript.js"></script>
+  <script type="text/javascript" src="http://www.google.com/jsapi?hl=en&key=ABQIAAAAKkfkHb2nXsD0o1OX2TbdkRTZdFmpiU8vv3PBIA-hr88t-5BzzxQjEeEmKaZUy66ADwTlY8x2M14hHg"></script>
+  <script type="text/javascript">
+  /* <![CDATA[ */
+  var ge;
+  google.load("earth", "1");
+
+  function init() {
+    google.earth.createInstance('map3d', initCB, failureCB);
+  }
+  
+  function initCB(instance) {
+    ge = instance;
+    ge.getWindow().setVisibility(true);
+    
+    // add a navigation control
+    ge.getNavigationControl().setVisibility(ge.VISIBILITY_AUTO);
+    
+    // add some layers
+    ge.getLayerRoot().enableLayerById(ge.LAYER_BORDERS, true);
+    ge.getLayerRoot().enableLayerById(ge.LAYER_ROADS, true);
+
+  }
+  
+  function failureCB() {
+    alert('Google earth loading failed!');
+  }
+  
+  function buttonClick() {
+    var lookAt = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
+    lookAt.setLatitude(lookAt.getLatitude() + 2);
+    lookAt.setLongitude(lookAt.getLongitude() + 20);
+    ge.getView().setAbstractView(lookAt);
+  }
+  
+  /* ]]> */
+  </script>
+</head>
+<body onload="init();">
+  <h1>Google Earth API Samples - Move Camera</h1>
+  <dl>
+            <dt>Last Modified:</dt><dd>07/25/08</dd>
+  </dl>
+  <div style="clear: both;"></div>
+  
+  <div id="ui" style="position: relative;">
+    <div id="map3d_container" style="border: 1px solid #000; width: 500px; height: 500px;">
+      <div id="map3d" style="height: 100%;"></div>
+    </div>
+  
+    <div id="extra-ui" style="position: absolute; left: 520px; top: 0;">
+      <input type="button" onclick="buttonClick()" value="Move the Camera!"/>
+      
+      <h2>Relevant Code Excerpt:</h2>
+      <pre name="code" class="jscript">
+  var lookAt = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
+  lookAt.setLatitude(lookAt.getLatitude() + 2);
+  lookAt.setLongitude(lookAt.getLongitude() + 20);
+  ge.getView().setAbstractView(lookAt);
+      </pre>
+    </div>
+  </div>
+  <script type="text/javascript">
+  dp.SyntaxHighlighter.ClipboardSwf = 'dp.SyntaxHighlighter/Scripts/clipboard.swf';
+  dp.SyntaxHighlighter.HighlightAll('code');
+  </script>
+</body>
+</html>
