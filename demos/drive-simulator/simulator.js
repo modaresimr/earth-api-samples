@@ -32,8 +32,8 @@ limitations under the License.
  * Original URL: http://sketchup.google.com/3dwarehouse/details?mid=e515b549a0c34881da447cc46b6a15fa&prevstart=0
  * @type {string}
  */
-DDSimulator.MODEL_URL = 'http://code.google.com/p/earth-api-samples/' +
-                        'svn/trunk/demos/drive-simulator/smart.kmz';
+DDSimulator.MODEL_URL = 'http://earth-api-samples.googlecode.com/svn/trunk/' +
+                        'demos/drive-simulator/smart.kmz';
 
 /**
  * The amount of real time to simulate per simulator tick
