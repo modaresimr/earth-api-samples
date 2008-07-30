@@ -14,7 +14,7 @@
   
   #directions-form fieldset,
   #simulator-form fieldset {
-    height: 100px;
+    height: 125px;
   }
   
   #route-details {
@@ -31,6 +31,7 @@
     list-style: decimal inside;
     position: relative;
     font-size: small;
+    padding-right: 50px !important;
   }
 
   .dir-step .note {

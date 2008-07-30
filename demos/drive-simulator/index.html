@@ -4,7 +4,8 @@
 <head>
   <title>Google Earth Plug-in Drive Simulator</title>
   <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
-  <script type="text/javascript" src="http://www.google.com/jsapi?hl=en&key=ABQIAAAAwbkbZLyhsmTCWXbTcjbgbRSzHs7K5SvaUdm8ua-Xxy_-2dYwMxQMhnagaawTo7L1FE1-amhuQxIlXw"></script>
+  <!-- API Key for code.google.com -->
+  <script type="text/javascript" src="http://www.google.com/jsapi?hl=en&key=ABQIAAAAsc0UQXoo2BnAJLhtpWCJFBSosDVG8KKPE1-m51RBrvYughuyMxQE66LrPr4ipiW57hTm1I6kl76oaQ"></script>
   <style type="text/css">@import "index.css";</style>
   <script type="text/javascript" src="../../lib/geplugin-helpers.js"></script>
   <script type="text/javascript" src="../../lib/math3d.js"></script>
@@ -69,46 +70,46 @@ google.setOnLoadCallback(DS_init);
 <h1>Google Earth Plug-in Drive Simulator</h1>
 <table style="width: 100%; height: 400px;">
 <tr>
-  <td style="width: 25%" valign="top">
-    <table style="width: 100%">
+  <td style="width: 300px" valign="top">
+    <table style="width: 300px">
       <tr>
         <td style="width: 50%" valign="top">
-          <form id="directions-form" onsubmit="return false;">
+          <form id="directions-form" onsubmit="return false;" action="get">
             <fieldset>
               <legend>Directions</legend>
-              From: <input type="text" id="from" value="San Francisco, CA"/><br/>
-              To: <input type="text" id="to" value="Mountain View, CA"/><br/>
-              <input type="button" onclick="DS_goDirections();" id="go" value="Go!"></input>
+              From:<br/>
+              <input type="text" id="from" value="San Francisco, CA"/><br/>
+              To:<br/>
+              <input type="text" id="to" value="Mountain View, CA"/><br/>
+              <input type="submit" onclick="DS_goDirections();" id="go" value="Go!"/>
             </fieldset>
           </form>
         </td>
         <td style="width: 50%" valign="top">
-          <form id="simulator-form" onsubmit="return false;">
+          <form id="simulator-form" onsubmit="return false;" action="get">
             <fieldset>
               <legend>Simulator</legend>
-              <input type="button" onclick="DS_controlSimulator('reset');" value="Reset"/>
-              <input type="button" onclick="DS_controlSimulator('start');" value="Start"/>
+              <input type="button" onclick="DS_controlSimulator('reset');" value="Reset"/><br/>
+              <input type="button" onclick="DS_controlSimulator('start');" value="Start"/><br/>
               <input type="button" onclick="DS_controlSimulator('pause');" value="Pause"/><br/>
-              Speed: <strong><span id="speed-indicator">1x</span></strong><br/>
-              <input type="button" onclick="DS_controlSimulator('slower');" value="Slower"/>
-              <input type="button" onclick="DS_controlSimulator('faster');" value="Faster"/>
+              Speed:<br/>
+              <input type="button" onclick="DS_controlSimulator('slower');" value="-"/>
+              <strong><span id="speed-indicator">1x</span></strong>
+              <input type="button" onclick="DS_controlSimulator('faster');" value="+"/>
             </fieldset>
           </form>
         </td>
       </tr>
-    </table>    
-    <div id="route-details">
-
-    
-    </div>
+    </table>
+    <div id="route-details"></div>
   </td>
-  <td style="width: 50%" valign="top">
+  <td style="width: 67%" valign="top">
     <div id="earth-container" style="border: 1px solid #000; height: 500px;">
       <div id="earth" style="height: 100%;"></div>
     </div>
     <div id="status"></div>
   </td>
-  <td style="width: 25%" valign="top">
+  <td style="width: 33%" valign="top">
     <div id="map-container" style="border: 1px solid #000; height: 500px;">
     
     </div>
