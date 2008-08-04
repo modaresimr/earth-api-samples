@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 /**
- * @fileoverview This is the main JavaScript file for the Drive Simulator
+ * @fileoverview This is the main JavaScript file for the Driving Simulator
  * @author Roman Nurik
  * @supported Tested in IE6+ and FF2+
  */
@@ -40,7 +40,7 @@ var DS_steps = [];
 var DS_path = []; // entire driving path
 
 /**
- * The global simulator instance that conducts the drive simulation
+ * The global simulator instance that conducts the driving simulation
  * @type {DDSimulator}
  */
 var DS_simulator; // instance of the DDSimulator class

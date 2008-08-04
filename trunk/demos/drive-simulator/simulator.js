@@ -210,7 +210,7 @@ DDSimulator.prototype.getTurnToDirection_ = function(heading1, heading2) {
  * Position the camera at the given location, slowly turning to eventually face
  * locFacing and zoom to an appropriate level for the current speed
  * @private
- * @param {google.maps.LatLng} loc Current drive location
+ * @param {google.maps.LatLng} loc Move to location
  * @param {google.maps.LatLng} locFacing Location to face
  */
 DDSimulator.prototype.moveToPointDriving_ = function(loc, locFacing) {
