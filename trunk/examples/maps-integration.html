@@ -8,7 +8,7 @@
   <style type="text/css">@import "static/dp.SyntaxHighlighter/Styles/SyntaxHighlighter.css";</style>
   <script type="text/javascript" src="static/dp.SyntaxHighlighter/Scripts/shCore.js"></script>
   <script type="text/javascript" src="static/dp.SyntaxHighlighter/Scripts/shBrushJScript.js"></script>
-  <script type="text/javascript" src="http://www.google.com/jsapi?hl=en&key=ABQIAAAAwbkbZLyhsmTCWXbTcjbgbRSzHs7K5SvaUdm8ua-Xxy_-2dYwMxQMhnagaawTo7L1FE1-amhuQxIlXw"></script>
+  <script type="text/javascript" src="http://www.google.com/jsapi?hl=en&amp;key=ABQIAAAAwbkbZLyhsmTCWXbTcjbgbRSzHs7K5SvaUdm8ua-Xxy_-2dYwMxQMhnagaawTo7L1FE1-amhuQxIlXw"></script>
   <script type="text/javascript">
   /* <![CDATA[ */
   var map;
@@ -17,13 +17,32 @@
   
   function init() {
     map = new GMap2(document.getElementById('map3d'));
-    map.addControl(new GMapTypeControl());
-    map.setCenter(new GLatLng(37, -122));
+    map.setCenter(new GLatLng(37, -122), 12);
+    map.addControl(new GHierarchicalMapTypeControl());
+    map.addControl(new GLargeMapControl());
+    
+    // add 'Earth' as one of the map types
     map.addMapType(G_SATELLITE_3D_MAP);
     
-    var directions = new GDirections(map);
-    map.getEarthInstance(function(o) { o.getWindow().setVisibility(true); } );
-    directions.load("from: Haight and Pierce St San Francisco, CA to: Haight and Divisadero San Francisco CA");
+    // create a marker
+    var marker = new GMarker(new GLatLng(37, -122));
+    GEvent.addListener(marker, "click", function() {
+      var html = '<div style="width: 210px; padding-right: 10px">Hello world!</div>';
+      marker.openInfoWindowHtml(html);
+    });
+    
+    map.addOverlay(marker);
+    google.maps.Event.trigger(marker, "click");
+  
+    // create a polyline (LineString Placemark in KML)
+    var polyline = new GPolyline([
+        new GLatLng(37.04, -122.04),
+        new GLatLng(37.02, -122.02),
+        new GLatLng(37.03, -122.01),
+        new GLatLng(37.01, -121.99)
+      ], "#ff0000", 10);
+    
+    map.addOverlay(polyline);
   }
   
   /* ]]> */
@@ -32,7 +51,7 @@
 <body onload="init();">
   <h1>Google Earth API Samples - Basic Maps/Earth Integration</h1>
   <dl>
-            <dt>Last Modified:</dt><dd>07/25/08</dd>
+            <dt>Last Modified:</dt><dd>08/04/08</dd>
   </dl>
   <div style="clear: both;"></div>
   
@@ -50,13 +69,32 @@ google.load(&quot;maps&quot;, &quot;2.xx&quot;);
 
 function init() {
   map = new GMap2(document.getElementById('map3d'));
-  map.addControl(new GMapTypeControl());
-  map.setCenter(new GLatLng(37, -122));
+  map.setCenter(new GLatLng(37, -122), 12);
+  map.addControl(new GHierarchicalMapTypeControl());
+  map.addControl(new GLargeMapControl());
+  
+  // add 'Earth' as one of the map types
   map.addMapType(G_SATELLITE_3D_MAP);
   
-  var directions = new GDirections(map);
-  map.getEarthInstance(function(o) { o.getWindow().setVisibility(true); } );
-  directions.load(&quot;from: Haight and Pierce St San Francisco, CA to: Haight and Divisadero San Francisco CA&quot;);
+  // create a marker
+  var marker = new GMarker(new GLatLng(37, -122));
+  GEvent.addListener(marker, &quot;click&quot;, function() {
+    var html = '&lt;div style=&quot;width: 210px; padding-right: 10px&quot;&gt;Hello world!&lt;/div&gt;';
+    marker.openInfoWindowHtml(html);
+  });
+  
+  map.addOverlay(marker);
+  google.maps.Event.trigger(marker, &quot;click&quot;);
+
+  // create a polyline (LineString Placemark in KML)
+  var polyline = new GPolyline([
+      new GLatLng(37.04, -122.04),
+      new GLatLng(37.02, -122.02),
+      new GLatLng(37.03, -122.01),
+      new GLatLng(37.01, -121.99)
+    ], &quot;#ff0000&quot;, 10);
+  
+  map.addOverlay(polyline);
 }
       </pre>
     </div>

@@ -1,0 +1,130 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+  <title>Google Earth API Samples - Parse KML (Interactive)</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <style type="text/css">@import "static/examples.css";</style>
+  <style type="text/css">@import "static/dp.SyntaxHighlighter/Styles/SyntaxHighlighter.css";</style>
+  <script type="text/javascript" src="static/dp.SyntaxHighlighter/Scripts/shCore.js"></script>
+  <script type="text/javascript" src="static/dp.SyntaxHighlighter/Scripts/shBrushJScript.js"></script>
+  <script type="text/javascript" src="http://www.google.com/jsapi?hl=en&amp;key=ABQIAAAAwbkbZLyhsmTCWXbTcjbgbRSzHs7K5SvaUdm8ua-Xxy_-2dYwMxQMhnagaawTo7L1FE1-amhuQxIlXw"></script>
+  <script type="text/javascript">
+  /* <![CDATA[ */
+  var ge;
+  google.load("earth", "1");
+
+  function init() {
+    google.earth.createInstance('map3d', initCB, failureCB);
+  }
+  
+  function initCB(instance) {
+    ge = instance;
+    ge.getWindow().setVisibility(true);
+    
+    // add a navigation control
+    ge.getNavigationControl().setVisibility(ge.VISIBILITY_AUTO);
+    
+    // add some layers
+    ge.getLayerRoot().enableLayerById(ge.LAYER_BORDERS, true);
+    ge.getLayerRoot().enableLayerById(ge.LAYER_ROADS, true);
+
+    // look at the San Francisco
+    var la = ge.createLookAt('');
+    la.set(37, -122,
+      0, // altitude
+      ge.ALTITUDE_RELATIVE_TO_GROUND,
+      0, // heading
+      0, // straight-down tilt
+      5000 // range (inverse of zoom)
+      );
+    ge.getView().setAbstractView(la);
+    
+  }
+  
+  function failureCB() {
+    alert('Google earth loading failed!');
+  }
+  
+  var currentKmlObject = null;
+  
+  function parseKmlFromTextarea() {
+    // remove the old parsed KML object if one exists
+    if (currentKmlObject)
+      ge.getFeatures().removeChild(currentKmlObject);
+    
+    var kmlBox = document.getElementById('kml-box');
+    var kmlString = kmlBox.value;
+    
+    // parse the text in the box and add it to Earth
+    try {
+      currentKmlObject = ge.parseKml(kmlString);
+      ge.getFeatures().appendChild(currentKmlObject);
+    } catch (ex) {
+      alert('Parse error');
+    }
+  }
+  
+  function buttonClick() {
+    parseKmlFromTextarea();
+  }
+  
+  /* ]]> */
+  </script>
+</head>
+<body onload="init();">
+  <h1>Google Earth API Samples - Parse KML (Interactive)</h1>
+  <dl>
+            <dt>Last Modified:</dt><dd>08/04/08</dd>
+  </dl>
+  <div style="clear: both;"></div>
+  
+  <div id="ui" style="position: relative;">
+    <div id="map3d_container" style="border: 1px solid #000; width: 500px; height: 500px;">
+      <div id="map3d" style="height: 100%;"></div>
+    </div>
+  
+    <div id="extra-ui" style="position: absolute; left: 520px; top: 0;">
+<h2>Parse this KML:</h2>
+<textarea id="kml-box" rows="14" cols="50" wrap="off" style="font-family: monospace; font-size: small">
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;kml xmlns=&quot;http://www.opengis.net/kml/2.2&quot;&gt;
+  &lt;Placemark&gt;
+    &lt;name&gt;Test Placemark&lt;/name&gt;
+    &lt;Point&gt;
+      &lt;coordinates&gt;
+        -122,37,0
+      &lt;/coordinates&gt;
+    &lt;/Point&gt;
+  &lt;/Placemark&gt;
+&lt;/kml&gt;</textarea><br/>
+<input type="button" onclick="buttonClick()" value="Parse and Add this KML!"/>
+      <h2>Relevant Code Excerpt:</h2>
+      <pre name="code" class="jscript">
+var currentKmlObject = null;
+
+function parseKmlFromTextarea() {
+  // remove the old parsed KML object if one exists
+  if (currentKmlObject)
+    ge.getFeatures().removeChild(currentKmlObject);
+  
+  var kmlBox = document.getElementById('kml-box');
+  var kmlString = kmlBox.value;
+  
+  // parse the text in the box and add it to Earth
+  try {
+    currentKmlObject = ge.parseKml(kmlString);
+    ge.getFeatures().appendChild(currentKmlObject);
+  } catch (ex) {
+    alert('Parse error');
+  }
+}
+      </pre>
+    </div>
+  </div>
+  <script type="text/javascript">
+  dp.SyntaxHighlighter.ClipboardSwf = 'dp.SyntaxHighlighter/Scripts/clipboard.swf';
+  dp.SyntaxHighlighter.HighlightAll('code');
+  </script>
+</body>
+</html>
