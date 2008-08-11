@@ -1,0 +1,143 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+  <title>Google Earth API Samples - Fetch KML (Interactive, Checkboxes)</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <style type="text/css">@import "static/examples.css";</style>
+  <style type="text/css">@import "static/dp.SyntaxHighlighter/Styles/SyntaxHighlighter.css";</style>
+  <script type="text/javascript" src="static/dp.SyntaxHighlighter/Scripts/shCore.js"></script>
+  <script type="text/javascript" src="static/dp.SyntaxHighlighter/Scripts/shBrushJScript.js"></script>
+  <script type="text/javascript" src="http://www.google.com/jsapi?hl=en&amp;key=ABQIAAAAwbkbZLyhsmTCWXbTcjbgbRSzHs7K5SvaUdm8ua-Xxy_-2dYwMxQMhnagaawTo7L1FE1-amhuQxIlXw"></script>
+  <script type="text/javascript">
+  /* <![CDATA[ */
+  var ge;
+  
+  // store the object loaded for the given file... initially none of the objects
+  // are loaded, so initialize these to null
+  var currentKmlObjects = {
+    'red': null,
+    'yellow': null,
+    'green': null
+  };
+  
+  google.load("earth", "1");
+
+  function init() {
+    google.earth.createInstance('map3d', initCB, failureCB);
+  }
+  
+  function initCB(instance) {
+    ge = instance;
+    ge.getWindow().setVisibility(true);
+    
+    // add a navigation control
+    ge.getNavigationControl().setVisibility(ge.VISIBILITY_AUTO);
+    
+    // add some layers
+    ge.getLayerRoot().enableLayerById(ge.LAYER_BORDERS, true);
+    ge.getLayerRoot().enableLayerById(ge.LAYER_ROADS, true);
+
+    // fly to Santa Cruz
+    var la = ge.createLookAt('');
+    la.set(37, -122,
+      0, // altitude
+      ge.ALTITUDE_RELATIVE_TO_GROUND,
+      0, // heading
+      0, // straight-down tilt
+      5000 // range (inverse of zoom)
+      );
+    ge.getView().setAbstractView(la);
+    
+    // if the page loaded with checkboxes checked, load the appropriate
+    // KML files
+    if (document.getElementById('kml-red-check').checked)
+      loadKml('red');
+    
+    if (document.getElementById('kml-yellow-check').checked)
+      loadKml('yellow');
+    
+    if (document.getElementById('kml-green-check').checked)
+      loadKml('green');
+    
+  }
+  
+  function failureCB() {
+    alert('Google earth loading failed!');
+  }
+  
+  function toggleKml(file) {
+    // remove the old KML object if it exists
+    if (currentKmlObjects[file]) {
+      ge.getFeatures().removeChild(currentKmlObjects[file]);
+      currentKmlObject = null;
+    }
+    
+    // if the checkbox is checked, fetch the KML and show it on Earth
+    var kmlCheckbox = document.getElementById('kml-' + file + '-check');
+    if (kmlCheckbox.checked)
+      loadKml(file);
+  }
+  
+  function loadKml(file) {
+    var kmlUrl = 'http://earth-api-samples.googlecode.com/svn/trunk/' +
+      'examples/static/' + file + '.kml';
+  
+    // fetch the KML
+    google.earth.fetchKml(ge, kmlUrl, function(kmlObject) {
+      // NOTE: we still have access to the 'file' variable (via JS closures)
+      
+      if (kmlObject) {
+        // show it on Earth
+        currentKmlObjects[file] = kmlObject;
+        ge.getFeatures().appendChild(kmlObject);
+      } else {
+        // bad KML
+        currentKmlObjects[file] = null;
+        alert('Bad KML');
+        
+        // uncheck the box
+        document.getElementById('kml-' + file + '-check').checked = '';
+      }
+    });
+  }
+  
+  
+  /* ]]> */
+  </script>
+</head>
+<body onload="init();">
+  <h1>Google Earth API Samples - Fetch KML (Interactive, Checkboxes)</h1>
+  <dl>
+            <dt>Last Modified:</dt><dd>08/04/08</dd>
+  </dl>
+  <div style="clear: both;"></div>
+  
+  <div id="ui" style="position: relative;">
+    <div id="map3d_container" style="border: 1px solid #000; width: 500px; height: 500px;">
+      <div id="map3d" style="height: 100%;"></div>
+    </div>
+  
+    <div id="extra-ui" style="position: absolute; left: 520px; top: 0;">
+<h2>Toggle KML Files:</h2>
+<input type="checkbox" id="kml-red-check" onclick="toggleKml('red');"/>
+<label for="kml-red-check">Red Placemarks</label><br/>
+
+<input type="checkbox" id="kml-yellow-check" onclick="toggleKml('yellow');"/>
+<label for="kml-yellow-check">Yellow Placemarks</label><br/>
+
+<input type="checkbox" id="kml-green-check" onclick="toggleKml('green');"/>
+<label for="kml-green-check">Green Placemarks</label><br/>
+      <h2>Relevant Code Excerpt:</h2>
+      <pre name="code" class="jscript">
+// The source for this example is too large to show as a code excerpt.
+// Please view the entire page source.
+      </pre>
+    </div>
+  </div>
+  <script type="text/javascript">
+  dp.SyntaxHighlighter.ClipboardSwf = 'dp.SyntaxHighlighter/Scripts/clipboard.swf';
+  dp.SyntaxHighlighter.HighlightAll('code');
+  </script>
+</body>
+</html>
