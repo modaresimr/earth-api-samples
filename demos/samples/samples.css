@@ -1,0 +1,89 @@
+body {
+  font-family: arial; 
+  overflow: hidden;
+}
+
+textarea {
+  padding: 6px;
+}
+
+form {
+  padding: 3px; 
+  background: #fafafa; 
+  margin-bottom: 0px; 
+  width: 100%
+}
+
+#log {
+  border: 1px solid silver; 
+  padding-left: 3px;
+  height: 400px;
+  overflow: auto; 
+  background: white;
+  font-size: 9pt;
+}
+
+#samples {
+  margin-left: 8px; 
+  margin-right: 8px; 
+  padding: 4px; 
+  width: 17em;
+  overflow: auto;
+  height: 300px;
+  border: 1px solid #ddd;
+  font-size: small;
+}
+
+.run_sample {
+  font-size: x-small;
+  float: right;
+}
+
+#map3d_container {
+  position: relative; 
+  border: 1px solid silver; 
+  height: 400px; 
+  width: 100%;
+}
+
+#map3d {  
+  height: 100%; 
+  width: 100%;
+  position: absolute; 
+  z-index: 10; 
+}
+
+#label {  
+  font-weight: bold; 
+}
+
+#toolbar {
+  font-size: 9pt;
+  float: right;
+  padding-top: 4px;
+}
+
+.toolbar_link {
+  margin-left: 8px;
+}
+
+#title {
+  font-weight: bold;
+  font-size: 16pt;
+}
+
+#subtitle {
+  font-weight: normal;
+  font-size: 12pt;
+}
+
+.header_info {
+  font-size: 10pt;
+  color: #A0A0A0; 
+  margin-left: 30px;
+}
+
+.sample_header {
+  padding-top: 6px;
+  font-weight: bold;
+}

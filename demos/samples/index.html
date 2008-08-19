@@ -1,0 +1,317 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN""http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<!--
+Copyright 2008 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+  <title>Google Earth Plugin - Interactive Samples</title>
+  <link rel=stylesheet href='samples.css' type='text/css' />
+  <!-- *** Replace the key below below with you own API key, available at http://code.google.com/apis/maps/signup.html *** -->
+  <script src="http://www.google.com/jsapi?key=ABQIAAAAwbkbZLyhsmTCWXbTcjbgbRSzHs7K5SvaUdm8ua-Xxy_-2dYwMxQMhnagaawTo7L1FE1-amhuQxIlXw"></script>
+  <script type="text/javascript">
+google.load("earth", "1");
+google.load("maps", "2.99");
+
+var ge = null;
+var timeAtStartup;
+var windowWidth = -1;
+var windowHeight = -1;
+var outText = '';
+var BOTTOM_MARGIN = 32;
+var RIGHT_MARGIN = 32;
+
+// Init 'counter' (which is used to create unique style IDs, for example)
+var counter = 1;
+
+function el(e) { return document.getElementById(e); }
+
+function Sample(description, url) {
+  this.description = description;
+  this.url = url;
+  return this;
+}
+
+var samples = [];
+
+function addSampleHeader(text) {
+  el('samples').innerHTML += '<div class=sample_header>' + text + '<br></div>';
+}
+
+function addSample(description, url) {
+  var num = samples.length;
+  samples.push(new Sample(description, url));
+  el('samples').innerHTML += 
+    '<div class="run_sample">' +
+    '  <a href="javascript:loadSample(' + num + ', true);void(0);"' +
+    ' id="run' + num + '">run</a></div>';
+  el('samples').innerHTML += 
+    '&nbsp;&nbsp;' +
+    '<a href="javascript:loadSample(' + num + ', false);void(0);">' +
+      description + 
+    '</a><br>';
+
+}
+
+function init() {
+  addSampleHeader('Camera control');
+  addSample('Move camera', 'movecamera.js');
+  addSample('Move camera w/timeouts', 'movecameratimeouts.js');
+  addSample('Tilt view', 'tiltView.js');
+
+  addSampleHeader('Placemarks and geometry');
+  addSample('Create Placemark', 'createplacemark.js');
+  addSample('Create ScreenOverlay', 'screenoverlay.js');  
+  addSample('Create ScreenOverlay frame', 'frame.js');  
+  addSample('Create LineString', 'createlinestring.js');
+  addSample('LineString style', 'linestringstyle.js');
+  addSample('Create Polygon', 'createpolygon.js');
+  addSample('Polygon style', 'polygonstyle.js');
+  addSample('Placemark StyleMap', 'createstylemap.js');
+  addSample('Create Polygon (circle)', 'createpolygoncircle.js');
+  addSample('Create GroundOverlay', 'groundoverlay.js');
+  addSample('Create 3d model', 'createModel.js');
+  addSample('Create NetworkLink', 'networklink.js');
+  addSample('Create MultiGeometry', 'createmultigeometry.js');
+
+  addSampleHeader('Balloons');
+  addSample('Open Feature balloon', 'openBalloon.js');
+  addSample('Open HTML String balloon', 'openHtmlStringBalloon.js');
+  addSample('Open HTML Div balloon', 'openHtmlDivBalloon.js');
+  addSample('Change balloon content', 'changeBalloonContent.js');
+  addSample('Close balloon', 'closeBalloon.js');
+
+  addSampleHeader('Events');
+  addSample('Globe/window events', 'globewindowevents.js');
+  addSample('Placemark events', 'placemarkevents.js');
+
+  addSampleHeader('KML');
+  addSample('Parse KML (Pentagon)', 'pentagon.js');
+  addSample('Fetch bad kml link', 'badfetch.js');
+  addSample('Fetch good kml', 'goodfetch1.js');
+
+  addSampleHeader('Misc');
+  addSample('Toggle Sky mode', 'togglesky.js');
+  addSample('Toggle terrain', 'terrain.js');
+  addSample('Toggle buildings', 'togglebuildings.js');
+  addSample('Test navigation control', 'navcontrol.js');
+  addSample('GMapsAPI geocoder', 'geocode.js');
+
+  log('<span style="color:#999"><i>' +
+      'Use log(string or number or object) to write ' +
+      'output here</i></span>');
+
+  resize();
+  
+  init3D();
+}
+
+function globalEval(script) {
+  if (!script)
+    return;
+  if (window.execScript) {
+    // On IE use this to exec script in global context
+    return window.execScript(script);
+  } else if (window.eval) {
+    // FF has eval as Object method
+    return window.eval(script);
+  } else {
+    return eval(script);
+  }
+}
+
+function loadSample(sampleNum, runIt) {
+  google.maps.DownloadUrl(samples[sampleNum].url, function(data, responseCode) {
+    if (data) {
+      el('sample_code').value = data;
+      if (runIt) {
+        globalEval(data);
+      }
+    }
+  });
+}
+
+function initCB(object) {
+  var elapsedStartupTime = (new Date()).getTime() - timeAtStartup;
+  el('startup_time').innerHTML = 'Startup time: ' +
+    (elapsedStartupTime/1000) + 's';
+
+  ge = object;
+  ge.getWindow().setVisibility(true);
+  showVersions(ge);
+}
+
+function failureCB(message) {
+  window.log('Plugin load failed: ' + message);
+}
+
+function init3D() {
+  timeAtStartup = (new Date()).getTime();
+  google.earth.createInstance("map3d", initCB, failureCB);
+}
+
+function showVersions(ge) {
+  var pluginVersion = ge.getPluginVersion();
+  var earthVersion = ge.getEarthVersion();
+
+  var html;
+  var color;
+  if (pluginVersion != earthVersion) {
+    color = "#FF0000";
+    html = "Plugin v.: " + pluginVersion + " != Earth v.:" + earthVersion;
+  } else {
+    color = "#A0A0A0";
+    html = "Version: " + pluginVersion;
+  }
+  var div = el('version_info');
+  div.style.color = color;
+  div.innerHTML = html;
+}
+
+function log(output) {
+  var evalOut = el('log');
+  if (output == null) {
+    output = 'null';
+  } else if (typeof output == 'object') {
+    try {
+      output = '[object]  type=' + output.getType();
+    } catch (e) {
+      output = '[object]';
+    }
+  } else if (output == undefined) {
+    output = 'undefined';
+  } else {
+    output = '' + output;
+  }
+
+  outText += '<div style="border-bottom:1px solid #f0f0f0;">' + 
+      output.replace(/\n/g, '<br>\n') + '</div>';
+
+  evalOut.innerHTML = outText + '<br><br>';
+  evalOut.scrollTop = evalOut.scrollHeight;
+}
+
+function unescapeXml(xml) {
+  return xml.
+    replace(/&lt;/g,   '<').
+    replace(/&gt;/g,   '>').
+    replace(/&apos;/g, "'").
+    replace(/&quot;/g, '"').
+    replace(/&amp;/g,  '&');
+}
+
+function getPosition(object) {
+  var left = object.offsetLeft;
+  var top = object.offsetTop;
+  object = object.offsetParent;
+  while (object) {    
+    left += object.offsetLeft;
+    top += object.offsetTop;
+    object = object.offsetParent;
+  }
+  return [left, top];
+}
+
+function stretchToBottom(object) {
+  var position = getPosition(object);
+  var newHeight = windowHeight - position[1] - BOTTOM_MARGIN;
+  if (newHeight > 0) {
+    object.style.height = newHeight + 'px';
+  }
+}
+
+function stretchToRight(object) {
+  var position = getPosition(object);
+  var newWidth = windowWidth - position[0] - RIGHT_MARGIN;
+  if (newWidth > 0) {
+    object.style.width = newWidth + 'px';
+  }
+}
+
+function resize() {
+  var width = 0;
+  var height = 0;
+
+  if (!window.innerWidth) {
+    if (document.documentElement.clientWidth != 0) {
+      width = document.documentElement.clientWidth;
+      height = document.documentElement.clientHeight;
+    } else {
+      width = document.body.clientWidth;
+      height = document.body.clientHeight;
+    }
+  } else {
+    width = window.innerWidth;
+    height = window.innerHeight;
+  }
+
+  windowWidth = width;
+  windowHeight = height;
+
+  stretchToBottom(el('samples'));
+  stretchToBottom(el('sample_code'));
+  stretchToRight(el('sample_code'));
+}
+
+  </script>
+</head>
+<body onload='init()' onunload='google.maps.Unload()' id='body' onresize='resize()'>
+  <div>
+    <span id='title'>
+      Google Earth Plugin <span style='font-weight:normal;'>/</span> <span id='subtitle'>Interactive Samples</span>
+    </span>
+
+    <span class='header_info' id='version_info'>
+      &lt;version info&gt;
+    </span>
+
+    <span class='header_info' id='startup_time'>
+      &lt;startup time&gt;
+    </span>
+  </div>
+
+  <table width='100%' cellspacing='6'>
+    <tr>
+      <td valign=top>
+        <div id='map3d_container'>
+          <div id='map3d'></div>
+        </div>
+      </td>
+      <td width='280px' valign=top>
+        <div id='log'>
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  <div>
+  <table width='100%'>
+    <tr>
+      <td valign=top width=200>
+        <div>
+          <div id='samples'>
+          </div>
+        </div>
+      </td>
+      <td valign=top>
+        <form action='javascript:globalEval(unescapeXml(el("sample_code").innerHTML) || el("sample_code").value);void(0);'>
+          <input type='submit' value='Run code'></input><br>
+          <textarea name=sample_code id=sample_code cols=80 rows=20/></textarea>
+        </form>
+      </td>
+    </tr>
+  </table>
+  </div>
+</body>
+</html>

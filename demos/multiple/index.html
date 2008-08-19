@@ -1,0 +1,244 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN""http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<!--
+Copyright 2008 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+    <title>Multiple Google Earths</title>
+    <!-- *** Replace the key below below with your own API key, available at http://code.google.com/apis/maps/signup.html *** -->
+    <script src="http://www.google.com/jsapi?key=ABQIAAAAwbkbZLyhsmTCWXbTcjbgbRSzHs7K5SvaUdm8ua-Xxy_-2dYwMxQMhnagaawTo7L1FE1-amhuQxIlXw"></script>
+    <script type="text/javascript">
+google.load("earth", "1");
+google.load("maps", "2.99");
+
+var numRows, numCols, earthWidth, earthHeight;
+var ge = [];
+var geocoder;
+
+function el(e) { return document.getElementById(e); }
+
+function foldl(array, f, base) {
+  function _foldl(array) {
+    if (array.length == 0)
+      return base;
+    return f(array[0], _foldl(array.slice(1)));
+  }
+  return _foldl(array);
+}
+
+// Return [f(0), f(1), ... f(n-1)]
+function mapn(f, n) {
+  function _mapn(n) {
+    if (n == 0)
+      return [];
+    return _mapn(n-1).concat([f(n-1)]);
+  }
+  return _mapn(n);
+}
+
+// Concatenate the (string) elements of the list returned by mapn
+function mapns(f, n) {
+  return foldl(mapn(f, n), function(a,b){return a.concat(b);}, "");
+}
+
+// Configure the HTML for an array of earth plugins, and launch the plugins
+function configureEarths() {
+  function validateNum(n, min) {
+    if (isNaN(n) || (n < min))
+      return min;
+    return n;
+  }
+
+  var inputNumRows = validateNum(el("earthRows").value, 1);
+  var inputNumCols = validateNum(el("earthCols").value, 1);
+
+  // Guard against opening zillions of earths
+  var inputNumEarths = inputNumRows * inputNumCols;
+  if (inputNumEarths >= 10) {
+    var answer = confirm("Are you crazy enough to open " + inputNumEarths +
+                         " earths?");
+    if (!answer)
+      return;
+  }
+
+  numRows = inputNumRows;
+  numCols = inputNumCols;
+  earthWidth = validateNum(el("earthWidth").value, 1);
+  earthHeight = validateNum(el("earthHeight").value, 1);
+
+  // Validity checking may have changed the values, so update the UI
+  el("earthRows").value = numRows;
+  el("earthCols").value = numCols;
+  el("earthWidth").value = earthWidth;
+  el("earthHeight").value = earthHeight;
+
+  function getEarthDivName(row, col) { return "earth" + col + "_" + row; }
+  function getEarthContainerDivName(row, col) {
+    return getEarthDivName(row, col) + "_container";
+  }
+
+  // Create the HTML table that will contain the earths
+  var earths = el('earths');
+  earths.innerHTML = "<table>" +
+    mapns(function(row) {
+        return "<tr>" + 
+          mapns(function(col) {
+            return "<td width=" + earthWidth + ">" + 
+              "  <div id='" + getEarthContainerDivName(row, col) +
+                "' style='border: 1px solid silver; height: " +
+                earthHeight + "px;'>" +
+              "    <div id='" + getEarthDivName(row, col) +
+                "' style='height: 100%;'></div>" +
+              "  </div>" +
+              "</td>";
+            }, numCols) +
+          "</tr>";
+        },
+        numRows) +
+    "</table>";
+
+  // Create the earths
+  ge = new Array(numRows);
+  mapn(function (row) {
+    ge[row] = new Array(numCols);
+    mapn(function (col) {
+      google.earth.createInstance(
+        getEarthDivName(row, col),
+        function(object) {
+          ge[row][col] = object; object.getWindow().setVisibility(true)
+        },
+        /***
+         * This function will be called if plugin fails to load, in case
+         * you need to handle that error condition.
+         ***/
+        function(object) {});
+    }, numCols)
+  }, numRows);
+
+  configureLayers();
+}
+
+function enableLayer(layerId, state) {
+  geDo(function(ge) {
+    ge.getLayerRoot().enableLayerById(ge[layerId], state);
+  });
+}
+
+function configureLayers() {
+  // Initial layer visibility
+  layers = new Array();
+  layers[0] = ['Terrain', 'LAYER_TERRAIN', true];
+  layers[1] = ['Roads', 'LAYER_ROADS', false];
+  layers[2] = ['Borders', 'LAYER_BORDERS', false];
+  layers[3] = ['Buildings', 'LAYER_BUILDINGS', false];
+
+  // Create the HTML for the layer checkboxes
+  var layerCheckboxes = el('layerCheckboxes');
+  layerCheckboxes.innerHTML = mapns(function(i) {
+    return "<input type=\"checkbox\" " +
+      "id=\"" + layers[i][1] + "\" " +
+      "onclick=\"enableLayer('" + layers[i][1] + "', this.checked);\" " +
+      (layers[i][2] ? "checked" : "") + ">" +
+      layers[i][0] + "</input>&nbsp;";
+  }, layers.length);
+}
+
+function init() {
+  configureEarths();
+  geocoder = new google.maps.ClientGeocoder();
+}
+
+// Do something to all of the earths
+function geDo(f) {
+  mapn(function (row) {
+    mapn(function (col) {
+      f(ge[row][col]);
+    }, numCols)
+  }, numRows);
+}
+
+function goToLocation(address) {
+  geocoder.getLatLng(
+    address, 
+    function(point) {
+      if (point && ge != null)
+        geDo(function(ge) {
+          var la = ge.createLookAt('');
+          la.set(point.y, point.x, 100, ge.ALTITUDE_RELATIVE_TO_GROUND, 
+                 0, 0, 4000);
+          ge.getView().setAbstractView(la);
+        });
+    }
+  );
+}
+
+function submitLocation() {
+  goToLocation(el('address').value);
+}
+
+function zipCodeTour(zipCode) {
+  if (el("zipCodeTourCheckbox").checked) {
+    el("zipCode").value = zipCode;
+    goToLocation(zipCode);
+    if (el("zipCodeRandom").checked)
+      nextZipCode = parseInt(Math.random() * 90000 + 10000).toString();
+    else
+      nextZipCode = (parseInt(zipCode) + 1).toString();
+    setTimeout(function() { zipCodeTour(nextZipCode); }, 3000);
+  }
+}
+
+function zipCodeTourStart() {
+  zipCodeTour(parseInt(el("zipCode").value));
+}
+
+</script>
+
+</head>
+<body onload='init()' id='body'>
+  <table>
+    <tr>
+      <td bgcolor=#dddddd>
+        <form id='earthsform' action='javascript:configureEarths();void(0);'>
+          Rows: <input type=text size=2 id='earthRows' value='2'></input>&nbsp;
+          Columns: <input type=text size=2 id='earthCols' value='2'></input>&nbsp;
+          Width: <input type=text size=3 id='earthWidth' value='400'></input>&nbsp;
+          Height: <input type=text size=3 id='earthHeight' value='300'></input>&nbsp;
+          <input type=submit value='Reconfigure'>
+        </form>
+      </td>
+      <td valign=top bgcolor=#dddddd>
+        <div id="layerCheckboxes"></div>
+      </td>
+    </tr>
+    <tr>
+      <td bgcolor=#dddddd>
+        <form action='javascript:submitLocation();void(0);'>
+          <input type=text size=40 id='address'></input>
+          <input type=submit value='Go to location'>
+        </form>
+      </td>
+      <td valign=top bgcolor=#dddddd>
+        <input id="zipCodeTourCheckbox" type="checkbox" onclick="zipCodeTourStart();">Zip Code Tour:</input>&nbsp;
+        <input id="zipCode" type="text" size=5 value="10001" />
+        <input id="zipCodeRandom" type="checkbox">Random</input>
+      </td>
+    </tr>
+  </table>
+
+  <div id="earths"></div>
+
+</body>
+</html>
