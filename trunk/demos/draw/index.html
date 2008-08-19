@@ -1,0 +1,113 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN""http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<!--
+Copyright 2008 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+  <title>Google Earth Plugin - Draw shapes</title>
+  <!-- *** Replace the key below below with your own API key, available at http://code.google.com/apis/maps/signup.html *** -->
+  <script type="text/javascript" src="http://www.google.com/jsapi?key=ABQIAAAAwbkbZLyhsmTCWXbTcjbgbRSzHs7K5SvaUdm8ua-Xxy_-2dYwMxQMhnagaawTo7L1FE1-amhuQxIlXw"></script>
+  <script type="text/javascript">
+google.load("earth", "1");
+
+var ge = null;
+var isMouseDown = false;
+var lineStringPlacemark = null;
+var coords = null;
+var pointCount = 0;
+var doc = null;
+
+function init() {
+  google.earth.createInstance("map3d", initCB, failureCB);
+}
+
+function initCB(object) {
+  ge = object;
+  ge.getWindow().setVisibility(true);
+
+  doc = ge.createDocument('');
+  ge.getFeatures().appendChild(doc);
+
+  google.earth.addEventListener(ge.getGlobe(), 'mousemove', onmousemove); 
+  google.earth.addEventListener(ge.getGlobe(), 'mousedown', onmousedown); 
+}
+
+function onmousemove(event) {
+  if (isMouseDown) {
+    coords.pushLatLngAlt(event.getLatitude(), event.getLongitude(), 0);
+  }
+}
+
+function convertLineStringToPolygon(placemark) {
+  var polygon = ge.createPolygon('');
+  var outer = ge.createLinearRing('');
+  polygon.setOuterBoundary(outer);
+
+  var lineString = placemark.getGeometry();
+  for (var i = 0; i < lineString.getCoordinates().getLength(); i++) {
+    var coord = lineString.getCoordinates().get(i);
+    outer.getCoordinates().pushLatLngAlt(coord.getLatitude(), 
+                                         coord.getLongitude(), 
+                                         coord.getAltitude());
+  }
+
+  placemark.setGeometry(polygon);
+}
+
+
+function onmousedown(event) {
+  if (isMouseDown) {
+    isMouseDown = false;
+    coords.pushLatLngAlt(event.getLatitude(), event.getLongitude(), 0);
+
+    convertLineStringToPolygon(lineStringPlacemark);
+  } else {
+    isMouseDown = true;
+
+    lineStringPlacemark = ge.createPlacemark('');
+    var lineString = ge.createLineString('');
+    lineStringPlacemark.setGeometry(lineString);
+    lineString.setTessellate(true);
+    lineString.setAltitudeMode(ge.ALTITUDE_CLAMP_TO_GROUND);
+
+    lineStringPlacemark.setStyleSelector(ge.createStyle(''));
+    var lineStyle = lineStringPlacemark.getStyleSelector().getLineStyle();
+    lineStyle.setWidth(4);
+    lineStyle.getColor().set('ddffffff');  // aabbggrr formatx
+    lineStyle.setColorMode(ge.COLOR_RANDOM);
+    var polyStyle = lineStringPlacemark.getStyleSelector().getPolyStyle();
+    polyStyle.getColor().set('ddffffff');  // aabbggrr format
+    polyStyle.setColorMode(ge.COLOR_RANDOM);
+
+    coords = lineString.getCoordinates();
+    coords.pushLatLngAlt(event.getLatitude(), event.getLongitude(), 0);
+
+    doc.getFeatures().appendChild(lineStringPlacemark);
+  }
+}
+
+function failureCB(object) {
+}
+
+  </script>
+</head>
+<body onload='init()' id='body'>
+  <div id='map3d_container' style='border: 1px solid silver; height: 600px; width: 600px;'>
+    <div id='map3d' style='height: 100%;'></div>
+  </div>
+  <br>
+  <input type=button onclick='javascript:alert(doc.getKml())' value='Show KML'>
+</body>
+</html>

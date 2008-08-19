@@ -1,0 +1,322 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN""http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<head>
+  <!--
+Copyright 2008 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+  -->
+  <link rel=stylesheet href='kmlplayground.css' type='text/css' />
+  <script type="text/javascript" src="init.js"></script>
+  <script type="text/javascript" src="geometry.js"></script>
+  <script type="text/javascript" src="overlay.js"></script>
+  <script type="text/javascript" src="util.js"></script>
+  <script type="text/javascript" src="table.js"></script>
+  <script src="http://www.google.com/jsapi?key=ABQIAAAAwbkbZLyhsmTCWXbTcjbgbRSzHs7K5SvaUdm8ua-Xxy_-2dYwMxQMhnagaawTo7L1FE1-amhuQxIlXw"></script> 
+  <script type="text/javascript">
+google.load("earth", "1");
+
+//-----------------------------------------------------------------------------
+// Global Variables
+//-----------------------------------------------------------------------------
+
+// Latitude, longitude, altitude
+var gLLA = [ 33.95, -118.25, 800 ];
+
+// The features are parented to the folder
+var gFolder = null;
+
+// Placemark, screen overlay, ground overlay
+var gFeatures = {
+  'placemark' : null,
+  'screenOverlay' : null,
+  'groundOverlay' : null
+};
+
+// Default selected feature is a placemark
+var gCurrentFeature = 'placemark';
+
+// Style, Style map
+var gStyleSelector = { 
+  'style' : null, 
+  'styleMap' : null 
+};
+
+var gCurrentStyle = 'style';
+
+// Style map icons
+var gStyleMapNormalIconUrls = [
+  '',
+  'http://maps.google.com/mapfiles/kml/shapes/triangle.png',
+  'http://maps.google.com/mapfiles/kml/paddle/red-circle.png' 
+];
+
+var gStyleMapHighlightIconUrls = [
+  '',
+  'http://maps.google.com/mapfiles/kml/shapes/square.png',
+  'http://maps.google.com/mapfiles/kml/paddle/grn-circle.png'
+];
+
+var gIconStyleIconUrls = [
+  'http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png',
+  'http://maps.google.com/mapfiles/kml/paddle/ylw-circle.png',
+  'http://maps.google.com/mapfiles/kml/paddle/blu-circle.png' 
+];
+
+var gOverlayIconUrls = [
+  '',
+  'http://www.google.com/google-d-s/images/arrow_right.png',
+  'http://www.google.com/options/icons/gmail.gif',
+  'http://www.google.com/nonprofits/images/youtube.gif'
+];
+
+// TODO: Change this when submitted to googledata
+var gModelUrls = [
+  'models/splotchy_box1.dae.xml',
+  'models/splotchy_box2.dae.xml',
+  'models/splotchy_box3.dae.xml'
+];
+
+//-----------------------------------------------------------------------------
+// Color
+//-----------------------------------------------------------------------------
+
+function updateKmlOutput() {
+  document.getElementById('kmlOutput').value = getCurrentFeature().getKml();
+}
+
+function getCurrentStyle() {
+  return gStyleSelector[gCurrentStyle];
+}
+
+function updateIconStyleHotSpot(divId, type, value) {
+  var vec2 = gStyleSelector['style'].getIconStyle().getHotSpot();
+  var loc;
+  if (value == 'CR') loc = [ 0.5, 0.5 ];
+  if (value == 'TL') loc = [ 0, 1 ];
+  if (value == 'TR') loc = [ 1, 1 ];
+  if (value == 'BL') loc = [ 0, 0 ];
+  if (value == 'BR') loc = [ 1, 0 ];
+
+  vec2.set(loc[0], ge.UNITS_FRACTION, loc[1], ge.UNITS_FRACTION);
+  selectItem(divId, type, 'CR', false);  
+  selectItem(divId, type, 'TL', false);  
+  selectItem(divId, type, 'TR', false);  
+  selectItem(divId, type, 'BL', false);  
+  selectItem(divId, type, 'BR', false);  
+  selectItem(divId, type, value, true);  
+}
+
+function updateIconStyleIcon(divId, type, value) {
+  gStyleSelector['style'].getIconStyle().getIcon().setHref(
+    gIconStyleIconUrls[parseInt(value)]);
+  selectItem(divId, type, '0', false);    
+  selectItem(divId, type, '1', false);
+  selectItem(divId, type, '2', false);
+  selectItem(divId, type, value, true);
+}
+
+function updateStyleDivs() {
+  showElement(document.getElementById('style'), 
+              gCurrentStyle == 'style');
+  showElement(document.getElementById('styleMap'), 
+              gCurrentStyle == 'styleMap');
+}
+
+function updateStyleMap(divId, type, value) {
+  var index = parseInt(value);
+  var style = gStyleSelector['styleMap'];
+  if (type == 'normal') {
+    style.getNormalStyle().getIconStyle().getIcon().setHref(
+      gStyleMapNormalIconUrls[index]);    
+  } else {
+    style.getHighlightStyle().getIconStyle().getIcon().setHref(
+      gStyleMapHighlightIconUrls[index]); 
+  }
+  selectItem(divId, type, '0', false);
+  selectItem(divId, type, '1', false);
+  selectItem(divId, type, '2', false);
+  selectItem(divId, type, value, true);
+}
+
+function updateStyles(divId, type, value) {
+  selectItem(divId, 'style', 'style', false);
+  selectItem(divId, 'styleMap', 'styleMap', false);
+  selectItem(divId, type, value, true);
+  gCurrentStyle = type;
+  gFeatures['placemark'].setStyleSelector(getCurrentStyle());
+  updateStyleDivs();
+}
+
+var colorMap = {
+  'red' : '0000ff',
+  'green' : '00ff00',
+  'blue' : 'ff0000',
+  'white' : 'ffffff'
+};
+
+var styleOverlayTypeMap = {
+  'iconStyle' : 'getCurrentStyle().getIconStyle()',
+  'polyStyle' : 'getCurrentStyle().getPolyStyle()',
+  'labelStyle' : 'getCurrentStyle().getLabelStyle()',
+  'lineStyle' : 'getCurrentStyle().getLineStyle()',
+  'listStyle' : 'getCurrentStyle().getListStyle()',
+  'balloonStyle' : 'getCurrentStyle().getBalloonStyle()',
+  'screenOverlay' : 'getCurrentFeature().getColor()',
+  'groundOverlay' : 'getCurrentFeature().getColor()'
+};
+
+function updateColor(divId, type, value) {
+  var obj = eval(styleOverlayTypeMap[divId]);
+  var color = '#ff' + colorMap[value];
+  obj['get' + toUpperCaseFirstLetter(type)]().set(color);
+  
+  selectItemColor(divId, type, value);
+}
+
+function updateColorMode(divId, type, value) {
+  var obj = eval(styleOverlayTypeMap[divId]);
+  var mode = (value == 'normal') ? ge.COLOR_NORMAL : ge.COLOR_RANDOM;
+  obj['set' + toUpperCaseFirstLetter(type)](mode);
+  
+  selectItem(divId, type, 'normal', false);
+  selectItem(divId, type, 'random', false);
+  selectItem(divId, type, value, true);
+}
+
+function checkForDecrease(value, number) {
+  return (value == 'decrease') ? -number : number;
+}
+
+function updateIncreaseDecreaseStyle(divId, type, value) {
+  var obj = eval(styleOverlayTypeMap[divId]);
+  var offset = 0;
+  if (type == 'scale') offset = 0.2;
+  if (type == 'heading') offset = 5;
+  if (type == 'width') offset = 1;
+  increaseDecrease(obj, type, value, offset);
+}
+
+function increaseDecrease(obj, type, value, offset) {
+  // lat/lon treated with same offset, altitude is different
+  var add = checkForDecrease(value, offset);  
+  var old = obj['get' + toUpperCaseFirstLetter(type)]();
+  obj['set' + toUpperCaseFirstLetter(type)](old + add);
+}
+
+function updateBool(divId, type, value) {
+  if (divId == 'polyStyle') {
+    var obj = eval(styleOverlayTypeMap[divId]);
+    obj['set' + toUpperCaseFirstLetter(type)](value);    
+  } else {
+    gFeatures[divId]['set' + toUpperCaseFirstLetter(type)](value);
+  }   
+}
+
+//-----------------------------------------------------------------------------
+// String
+//-----------------------------------------------------------------------------
+
+function updateString(divId, type, value) {
+  selectItem(divId, type, 'foo', false);
+  selectItem(divId, type, 'hello', false);
+  selectItem(divId, type, 'google', false);  
+  selectItem(divId, type, value, true);
+  
+  gFeatures[divId]['set' + toUpperCaseFirstLetter(type)](value);
+}
+
+//-----------------------------------------------------------------------------
+// Geometry
+//-----------------------------------------------------------------------------
+
+function getCurrentFeature() {
+  return gFeatures[gCurrentFeature];
+}
+
+function showFeature(feature, visible) {  
+  showElement(document.getElementById(feature), visible);  
+  selectFeature(feature + 'Select', visible);
+  gFeatures[feature].setVisibility(visible);
+}
+
+function updateFeature(feature) { 
+  gCurrentFeature = feature;
+  
+  showFeature('placemark', false);
+  showFeature('screenOverlay', false);
+  showFeature('groundOverlay', false);  
+  showFeature(feature, true);
+
+  // Show geom section based on input
+  var isPlacemark = (feature == 'placemark');
+  showElement(document.getElementById('geometry'), isPlacemark);
+  showElement(document.getElementById('styleselector'), isPlacemark);
+  updateStyleDivs();  
+  updateKmlOutput();
+}
+
+function folderVis(vis) {
+  gFolder.setVisibility(vis);
+}
+</script>
+</head>
+<!-- -------------------------------------------------------------------- //-->
+
+<body onload='init()' id='body'>
+  <span id='title'>
+    Google Earth Plugin <span style='font-weight:normal;'>/</span> 
+    <span id='subtitle'>KML Playground</span>
+  </span>
+  <table width='100%' cellspacing='6'>
+    <tr>
+      <td valign=top>
+        <div id='map3d_container'>
+          <div id='map3d'></div>
+        </div>
+      </td>
+      <td width='280px' valign=top>
+        Scene KML<br>
+        <textarea name='kmlOutput' id='kmlOutput' cols=80 rows=28 wrap="off"/>
+        </textarea>
+      </td>
+    </tr>
+  </table>
+
+<!-- -------------------------------------------------------------------- //-->
+<div id='folderAndFeatureSelection'>
+</div>
+ 
+<br>
+<br>
+<table>
+<tr>
+ <td valign="top" width='300px'>
+  <!-- Placemark/Overlay/ScreenOverlay //-->
+  <div id='feature'></div>
+ </td>
+ <td valign="top" width='220px'>
+  <!-- Style/StyleMap //-->
+  <div id='styleselector'>
+   <div id='style'></div> 
+   <div id='styleMap'></div>
+  </div>
+ </td>
+ <td valign="top" width='300px'>
+  <!-- Geometry //-->
+  <div id='geometry'></div>  
+ </td>
+</tr>
+</table>
+</body>
+</html>

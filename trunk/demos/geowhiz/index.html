@@ -1,0 +1,272 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN""http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <head>
+<!--
+Copyright 2008 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+    <title>Are you a GEO WHIZ?</title>
+  <link rel=stylesheet href='geowhiz.css' type='text/css' />
+  <!-- *** Replace the key below below with your own API key, available at http://code.google.com/apis/maps/signup.html *** -->
+  <script src="http://www.google.com/jsapi?key=ABQIAAAAwbkbZLyhsmTCWXbTcjbgbRSzHs7K5SvaUdm8ua-Xxy_-2dYwMxQMhnagaawTo7L1FE1-amhuQxIlXw"></script>
+  <script type="text/javascript" src="geowhiz.js"></script>
+  <script type="text/javascript">
+google.load("earth", "1");
+google.load("maps", "2.99");
+
+//---------------------------------------------------------------------------
+// PLUGIN RELATED CODE
+//---------------------------------------------------------------------------
+
+var ge = null;
+var geocoder;
+
+function el(e) { return document.getElementById(e); }
+
+function Sample(description, url) {
+  this.description = description;
+  this.url = url;
+  return this;
+}
+
+var samples = [];
+
+function init() {
+  geocoder = new GClientGeocoder();
+
+  init3D();
+}
+
+function initCB(object) {
+  ge = object;
+  ge.getWindow().setVisibility(true);
+
+  // App is ready to go! Initial 
+  initGeoWhiz();
+}
+
+function failureCB(object) {
+  /***
+   * This function will be called if plugin fails to load, in case
+   * you need to handle that error condition.
+   ***/
+}
+
+function init3D() {
+  google.earth.createInstance("map3d", initCB, failureCB);
+}
+
+function unescapeXml(xml) {
+  return xml.
+    replace(/&lt;/g,   '<').
+    replace(/&gt;/g,   '>').
+    replace(/&apos;/g, "'").
+    replace(/&quot;/g, '"').
+    replace(/&amp;/g,  '&');
+}
+
+//===========================================================================
+// GEO WHIZ RELATED GUI CODE
+//===========================================================================
+
+// Global variables
+function StringIntPair(str, intval) {
+  this.str = str;
+  this.intval = intval;
+}
+
+// The places that will be asked
+var geographyList = new Array();
+geographyList[0]  = new StringIntPair("San Francisco, CA, USA", 10000);
+geographyList[1]  = new StringIntPair("Austin, TX, USA", 15000);
+geographyList[2]  = new StringIntPair("Ottawa, ON, Canada", 15000);
+geographyList[3]  = new StringIntPair("Panama City, Panama", 15000);
+geographyList[4]  = new StringIntPair("Helsinki, Finland", 20000);
+geographyList[5]  = new StringIntPair("Istanbul Turkey", 25000);
+geographyList[6]  = new StringIntPair("Port Louis, Mauritius", 25000);
+geographyList[7]  = new StringIntPair("Tokyo, Japan", 20000);
+geographyList[8]  = new StringIntPair("Beijing, China", 15000);
+geographyList[9]  = new StringIntPair("Sydney, Australia", 15000);
+geographyList[10] = new StringIntPair("Tahiti, French Polynesia", 15000);
+geographyList[11] = new StringIntPair("Edmonton, Alberta, Canada", 15000);
+geographyList[12] = new StringIntPair("St John's, NL, Canada", 15000);
+geographyList[13] = new StringIntPair("Glasgow, UK", 15000);
+geographyList[14] = new StringIntPair("Moscow, Russia", 15000);
+
+// Score and index
+var currentIndex = 0;
+var score = 0;
+
+function initGeoWhiz() {
+  // Set the initial view
+  var la = ge.createLookAt('');
+  la.set(39, 1000, 4000000, ge.ALTITUDE_RELATIVE_TO_GROUND, 0, 0, 99.99);
+  ge.getView().setAbstractView(la);
+  window.createReticle();
+  alert("Rules:\n\nMove the earth such that the reticle is on top of the geographic location requested. That's all there is to it!");
+
+  // Start the game
+  lookForNewLocation();
+}
+
+// The place was found on time, go to the next location
+window.onFound = function() {
+  score++;
+  lookForNewLocation(true);
+}
+
+// Not found on time. Move on.
+window.onTimeExpired = function() {
+  lookForNewLocation(false);
+}
+
+// Check gui updates
+window.onUpdateCallback = function(timeLeft) {
+  if (timeLeft >= 0)
+    document.getElementById('time').innerHTML = timeLeft;
+}
+
+// Helper function to concatenate score / total question
+function getScoreAsString() {
+  return score + "/" + currentIndex;
+}
+
+// Updates the right column showing a + for a point and a - for a miss
+function updateResults(found) {
+  var contents = document.getElementById('results').innerHTML;
+  var check = found ? "+" : "-";
+  var color = found ? "green" : "red";
+  var newline = "<font color=" + color + "><br>[" + check + "] " + 
+                geographyList[currentIndex-1].str + "</font>";
+  document.getElementById('results').innerHTML = contents + newline;
+}
+
+// Helper for getting a variation of messages
+function getRandInt(max) {
+  var rand = Math.random();
+  return Math.floor(rand * max) % max;
+}
+
+var positiveMessageList = [
+  "Good job!",
+  "Yes!",
+  "Your geography is so good, you should deliver milk!",
+  "Keep it up!",
+  "Geo Whiz, here we come!",
+  "You found it!"];
+  
+function getNegativeMsg() {
+  return negativeMessageList[getRandInt(negativeMessageList.length)]; 
+}
+
+var negativeMessageList = [
+  "Ran out of time!",
+  "DOH!",
+  "Times up, but let's move on.",
+  "Was it too hard?",
+  "Sigh.",
+  "Bummer."];
+
+function getPositiveMsg() {
+  return positiveMessageList[getRandInt(positiveMessageList.length)]; 
+}
+
+// Traverses the list the list of questions
+function lookForNewLocation(found) {
+  // Are there any questions left?
+  if (currentIndex < geographyList.length) { 
+    // Update the score and move onto the next question.
+    if (currentIndex != 0) {
+      updateResults(found);
+      document.getElementById('score').innerHTML = getScoreAsString();
+      if (!found) {
+        alert(getNegativeMsg() + " Now find: " + 
+              geographyList[currentIndex].str);		
+      } else
+        alert(getPositiveMsg() + " Now find: " + 
+              geographyList[currentIndex].str);		
+    } else {
+      alert("First, find: " + geographyList[currentIndex].str);
+    }
+    window.find(geographyList[currentIndex].str, 
+                geographyList[currentIndex].intval);
+    document.getElementById('find').innerHTML = 
+             geographyList[currentIndex].str;
+    currentIndex++;    
+  } else { 
+    // Game over. Give the user some nice words of encouragement :).
+    updateResults(found);   
+    var scoreString = getScoreAsString();
+    document.getElementById('outputgroup').innerHTML =
+                "FINISHED! <font color=red>SCORE : " + scoreString + "</font>";  
+    var percent = eval(scoreString);
+    if (percent < 0.10) 
+      alert("Game over: You need to study!");
+    else if (percent < 0.25) 
+	  alert("Game over: You should take this quiz again!");
+    else if (percent < 0.50) 
+	  alert("Game over: You're still not a Geo Whiz");
+    else if (percent < 0.65) 
+	  alert("Game over: You need to use Google Earth more!");
+    else if (percent < 0.75) 
+	  alert("Game over: Getting closer to being a geo whiz!");
+    else if (percent == 1.0) 
+	  alert("You're a Geo Whiz! That's why you're in google!");
+    else 
+	  alert("Game over: G E O...W H I...!"); // So close..
+  }
+}
+
+//---------------------------------------------------------------------------
+
+</script>
+  </head>
+  <body onload='init()' onunload="GUnload()" id='body'>
+    <div class="title">
+      <i>GEO WHIZ!</i>
+    </div>
+    
+    <table>
+       <tr><td>
+	   <div id='map3d_container'>
+	     <div id='map3d'></div>
+	   </div>
+	 </td><td valign=top>
+	   <div id='resultstitle' class="subtitle">Results</div>
+	   <div id='results' class="resultsgroup"></div>
+       </td></tr>
+    </table>
+
+    <div id="outputgroup" class="title">
+
+      <table>
+	<tr><td>
+	    <div id="findtitle" class="subtitle">FIND LOCATION</div>
+	    <div id="find" class="textgroup"></div>
+	  </td><td>
+
+	    <div id="timetitle" class="subtitle">TIME LEFT</div>
+	    <div id="time" class="textgroup"></div>
+
+	  </td><td>
+
+	    <div id="scoretitle" class="subtitle">SCORE</div>
+	    <div id="score" class="textgroup"></div>
+	</td></tr>
+      </table>
+
+    </div>
+
+  </body>
+</html>
