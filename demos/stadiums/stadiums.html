@@ -1,0 +1,201 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+  <title>Stadiums Sample
+</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <script type="text/javascript" src="http://www.google.com/jsapi?key=ABQIAAAAwbkbZLyhsmTCWXbTcjbgbRSzHs7K5SvaUdm8ua-Xxy_-2dYwMxQMhnagaawTo7L1FE1-amhuQxIlXw"></script>
+  <script type="text/javascript">
+
+  var ge;
+  var la;
+  var latitude;
+  var longitude;
+  var heading;
+  var buildings;
+  var turning;
+  var frameendEL;
+  var kmzs;
+  var nls;
+  google.load("earth", "1");
+
+  function init() {
+    google.earth.createInstance('map3d', initCB, failureCB);
+  }
+  
+  function initCB(instance) {
+      ge = instance;
+    ge.getWindow().setVisibility(true);
+    kmzs = ['http://sketchup.google.com/3dwarehouse/download?mid=6151c8c840ebdecfc37544baf5685388&rtyp=k2&fn=FedEx_Forum&ctyp=other&prevstart=0&ts=1202486526000','http://sketchup.google.com/3dwarehouse/download?mid=1933f060194b3cd9c7fa50fe5624075&rtyp=k2&fn=AT_TPark&ctyp=other&prevstart=0&ts=1202485416000','http://sketchup.google.com/3dwarehouse/download?mid=7aba8ef7a6384e213f4b71814119481e&rtyp=k2&fn=Superdome&ctyp=other&prevstart=0&ts=1202486919000','http://sketchup.google.com/3dwarehouse/download?mid=d0a60e59dd298c82109a355e8e5ea0c3&rtyp=k2&fn=Madison+Square+Garden&ctyp=other&prevstart=0&ts=1202488336000','http://sketchup.google.com/3dwarehouse/download?mid=8c4c2c716879dc31bab90bd41207498c&rtyp=k2&fn=Untitled&ctyp=other&prevstart=0&ts=1205276384000','http://sketchup.google.com/3dwarehouse/download?mid=ac7025ba5f4b91a41cc7117eeb26f175&rtyp=k2&fn=Yankee+Stadium&ctyp=other&prevstart=0&ts=1202487745000'];
+    nls=[];
+    frameendEL = false;
+    buildings = false;
+    for (var i=0; i < kmzs.length;i++){
+      loadKmz(kmzs[i]);
+    }
+
+   
+
+    ge.getNavigationControl().setVisibility(ge.VISIBILITY_AUTO);
+    
+    ge.getLayerRoot().enableLayerById(ge.LAYER_BORDERS, true);
+    ge.getLayerRoot().enableLayerById(ge.LAYER_ROADS, true);
+    ge.getLayerRoot().enableLayerById(ge.LAYER_TERRAIN,true);
+
+    la = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
+    var win = ge.getWindow();
+    window.google.earth.addEventListener(win, 'mousedown',stopFly);
+
+
+
+    
+
+  }
+  function toggleBuildings(){
+  if (!buildings)
+  {
+  buildings = true;
+  toggleVisibilityNLs(false);
+  ge.getLayerRoot().enableLayerById(ge.LAYER_BUILDINGS, buildings);
+
+  }
+  else
+  {
+  buildings = false;
+  toggleVisibilityNLs(true);
+  ge.getLayerRoot().enableLayerById(ge.LAYER_BUILDINGS, buildings);
+  }
+  }
+    function loadKmz(kmzFile){
+  
+  var networkLink = ge.createNetworkLink("");
+  networkLink.setName("Opened KMZ File");
+networkLink.setFlyToView(false);  
+var link = ge.createLink("");
+link.setHref(kmzFile);
+networkLink.setLink(link);
+networkLink.setVisibility(true);
+ge.getFeatures().appendChild(networkLink);
+nls.push(networkLink);
+
+
+
+return networkLink;
+  }
+  function toggleVisibilityNLs(visibility){
+  var nl;
+  for (var x=0; x<6; x+=1){
+  
+  nls[x].setVisibility(visibility);
+  
+  }
+  
+  }
+
+  function failureCB() {
+    alert('Google earth loading failed!');
+  }
+  function createPlacemark(lat,lng){
+  var placemark = ge.createPlacemark('');
+  var point = ge.createPoint('');
+  point.setLatitude(lat);
+  point.setLongitude(lng);
+  placemark.setGeometry(point);
+  ge.getFeatures().appendChild(placemark);
+  }
+  function za(lat,lng,head,range,altitude,tilt){
+    turning = false;
+    latitude = lat;
+    longitude = lng;
+    heading = head;
+    la.set(lat,lng,0,ge.ALTITUDE_RELATIVE_TO_GROUND,heading,tilt,range);
+    toggleFrameendEL();
+    ge.getOptions().setFlyToSpeed(.25);
+    ge.getView().setAbstractView(la);
+    turning = false;
+    
+    }
+  
+  function toggleFrameendEL(){
+  if (!frameendEL){
+  window.google.earth.addEventListener(ge, 'frameend', zoomAround);
+  frameendEL = true;
+  }else{
+  google.earth.removeEventListener(ge, 'frameend', zoomAround);
+  frameendEL = false;
+  }
+  
+  }
+  function zoomAround(){
+              
+    latemp = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
+    
+    if ((latemp.getLatitude().toFixed(4) == latitude.toFixed(4) && latemp.getLongitude().toFixed(4) == longitude.toFixed(4))|turning){
+    turn();
+    turning = true;
+   
+    }
+     
+
+
+
+
+
+  }
+  
+  function turn(){
+   ge.getOptions().setFlyToSpeed(1000);
+    heading+=.5;
+    if (heading > 360){
+    heading -= 360;}   
+
+    la.setHeading(heading);
+    la.setLatitude(latitude);
+    la.setLongitude(longitude);
+    ge.getView().setAbstractView(la);    
+  }
+ 
+  function buttonClick(lat,lng,head,range,altitude,tilt) {
+    za(lat,lng,head,range,altitude,tilt);
+  }
+  function stopFly() {
+    if(frameendEL){
+      toggleFrameendEL();
+    }
+    ge.getOptions().setFlyToSpeed(1);
+    turning = false;
+  }
+  
+  </script>
+</head>
+  <body onload='init()' id='body'>
+    <table width='725px' cellspacing='6'>
+    <tr>
+      <td valign=top>
+      <div id='map3d_container'
+           style='border: 1px solid silver; height: 500px; width: 725px;'>
+        <div id='map3d' style='height: 100%;'></div>
+      </div>
+      </td><td>      <input type="button" onclick="stopFly()" value="Stop Fly Arounds"/><br/>
+      <input type="button" onclick="toggleBuildings()" value="Additional Buildings"/>
+</td>
+   </tr>
+
+     <tr align=center>
+	<td valign=top>
+
+      <input type="button" onclick="buttonClick(35.138212606811,-90.050850087317,143.605,300,20.86364761834882,65)" value="FedEx Forum"/>
+      <input type="button" onclick="buttonClick(37.778453112329,-122.389408586711,0,250,0,65)" value="AT&T Park"/>
+            <input type="button" onclick="buttonClick(29.950811059696,-90.080847237054,249.998,379.9154952525105,71.67940410851992,79.2539)" value="Superdome"/>
+            
+            <input type="button" onclick="buttonClick(42.346514074589,-71.097028938396,125.511,171.4562386994005,84.0498,69.69232271433913)" value="Fenway Park"/>
+                        <input type="button" onclick="buttonClick(40.750286935011,-73.993079878223,84.5947,669.8728963136045,60.84543083184953,57.9843)" value="Madison Square Garden"/>
+                         <input type="button" onclick="buttonClick(40.827018414831,-73.927769110381,97.0602,243.1431068574123,144.1625422900115,45)" value="Yankee Stadium"/>
+       </td>
+    </tr>
+  </table>
+
+
+</body>
+</html>
