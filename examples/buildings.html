@@ -54,7 +54,7 @@
     ge.getView().setAbstractView(la);
     // Fly to San Francisco
     var la = ge.createLookAt('');
-    la.set(37.79333, -122.40, 0, ge.ALTITUDE_MODE_RELATIVE_TO_GROUND, 0, 70, 1000);
+    la.set(37.79333, -122.40, 0, ge.ALTITUDE_RELATIVE_TO_GROUND, 0, 70, 1000);
     ge.getView().setAbstractView(la);
     
   }
@@ -68,7 +68,7 @@
     
     setTimeout(function() {
                  var la = ge.createLookAt('');         
-                 la.set(37.79333, -122.40, 0, ge.ALTITUDE_MODE_RELATIVE_TO_GROUND, 
+                 la.set(37.79333, -122.40, 0, ge.ALTITUDE_RELATIVE_TO_GROUND, 
                         180, 50, 1000);
                  ge.getView().setAbstractView(la);
                }, 10000);
@@ -123,7 +123,7 @@ function showBuildings() {
   
   setTimeout(function() {
                var la = ge.createLookAt('');         
-               la.set(37.79333, -122.40, 0, ge.ALTITUDE_MODE_RELATIVE_TO_GROUND, 
+               la.set(37.79333, -122.40, 0, ge.ALTITUDE_RELATIVE_TO_GROUND, 
                       180, 50, 1000);
                ge.getView().setAbstractView(la);
              }, 10000);
