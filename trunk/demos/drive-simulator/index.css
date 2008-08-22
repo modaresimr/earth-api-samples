@@ -19,6 +19,7 @@
   
   #route-details {
     height: 400px;
+    position: relative;
     overflow: auto;
   }
 
