@@ -19,43 +19,24 @@
 var feed;
 var curNum;
 
-var classes = [
-'GControl',
-'GClientGeocoder',
-'GDirections',
-'GDraggableObject',
-'GGeoXml',
-'GGoogleBarOptions',
-'GGroundOverlay',
-'GIcon',
-'GInfoWindowOptions',
-'GMapType',
-'GMarker',
-'GMarkerOptions',
-'GOverlay',
-'GPolygon',
-'GPolyline',
-'GProjection',
-'GScreenOverlay',
-'GStreetviewPanorama',
-'GStreetviewClient',
-'GStreetviewOverlay',
-'GTileLayer',
-' ',
-'DragZoomControl',
-'ExtInfoWindow',
-'ExtMapTypeControl',
-'LabeledMarker',
-'MarkerManager'
+var topics = [
+  ['kml', 'KML'],
+  ['3dmodel', '3D Models (COLLADA)'],
+  ['mapsint', 'Maps/Earth Integration'],
+  ['mashup', 'Mashups w/ other APIs'],
+  ['geometry', 'Geometries'],
+  ['balloon', 'Balloon Windows'],
+  ['view', 'LookAt and Camera'],
+  ['events', 'Events'],
+  ['networklink', 'Network Links']
 ];
 
+topics = topics.sort()
 
 // Change these parameters to customize map
-var param_wsId = "od6";
-var param_ssKey = "o16162288751915453340.4402783830945175750";
 function cm_load() {  
   document.getElementById("searchbox").value = getURLParam("searchquery");
-  createClassSelect();
+  createTopicSelect();
   cm_getJSON(true);
 }
 
@@ -71,7 +52,7 @@ function getURLParam(name) {
   return (results === null ? "" : results[1]);
 }
 
-function cm_loadMapJSON(json) {
+function cm_loadSamplesJSON(json) {
   feed = json.feed;
   curNum = 0;
   if ( !feed.entry) {
@@ -79,7 +60,7 @@ function cm_loadMapJSON(json) {
   } 
   updateGallery();
     
-  if (feed.entry.length <=5) {
+  if (!feed.entry || feed.entry.length <=5) {
     document.getElementById("nextBUTTON").disabled = true;
   } else {
     document.getElementById("nextBUTTON").disabled = false;
@@ -88,12 +69,14 @@ function cm_loadMapJSON(json) {
 }
 
 function updateGallery() {
+  if (!feed.entry)
+    return;
   var min = curNum;
   var max = Math.min(curNum+5, feed.entry.length);
   var htmlAll = ['<br/>Showing ' + (min + 1) + ' - ' + max + ' of ' + feed.entry.length];
-  var className = document.getElementById('classdropdown').value;
+  var topic = document.getElementById('topicdropdown').value;
   var searchTerm = document.getElementById('searchbox').value;
-  var searchLink = 'http://code.google.com/apis/earth/documentation/demogallery.html' + '?searchquery=' + searchTerm + '&classname=' + className;
+  var searchLink = 'http://code.google.com/apis/earth/documentation/demogallery.html' + '?searchquery=' + searchTerm + '&topic=' + topic;
   htmlAll.push('  (<a href="' + searchLink + '" target="_blank">Link to this search</a>)');
   htmlAll.push('<table><tbody>');
   for (var i = min; i < max; i++) {
@@ -102,19 +85,24 @@ function updateGallery() {
       var author = entry.gsx$author.$t;
       var description = entry.gsx$description.$t;
       var thumbnailurl = entry.gsx$thumbnailurl.$t;
+      var srcurl = entry.gsx$srcurl.$t;
       var url = entry.gsx$url.$t;
-      var classesUsed = [];
-      for (var j = 0; j < classes.length; j++) {
-        var classColumnName = 'gsx$' + classes[j].toLowerCase();
-        if (entry[classColumnName] && entry[classColumnName].$t == 'yes') {
-          classesUsed.push(classes[j]);
+      var topicsUsed = [];
+      for (var j = 0; j < topics.length; j++) {
+        var topicColumnName = 'gsx$topic' + topics[j][0].toLowerCase();
+        if (entry[topicColumnName] && entry[topicColumnName].$t.toLowerCase() == 'yes') {
+          topicsUsed.push(topics[j][1]);
         }
       }
-      var html = '<tr><td><a target="_blank" href="' + url + '"><img style="width: 160px; height: 128px" src="' + thumbnailurl + '"/></a></td><td valign="top"><strong><a target="_blank" href="' + url + '">' + title + '</a></strong> <br/>' + description + '<br/><br/>';
-      if (classesUsed.length > 0) {
-        html += 'Classes used: <code>' + classesUsed.join(',') + '</code><br/><br/>';
+      var html = '<tr><td><a target="_blank" href="' + url + '">' +
+        '<img style="width: 160px; height: 128px" src="' + thumbnailurl + '"/></a></td>' +
+        '<td valign="top"><strong><a target="_blank" href="' + url + '">' + title + '</a></strong>' +
+        (srcurl ? '<p style="margin-top: 0; font-size: 10px; font-style: italic;"><a target="_blank" href="' + srcurl + '">See full source</a></p>' : '') +
+        '<p>' + description + '</p>';
+      if (topicsUsed.length > 0) {
+        html += '<p>Topics covered: <em>' + topicsUsed.join(', ') + '</em></p>';
       }
-      html += '<span style="font-size:10px; font-style: italic">' + 'Example by ' + author + '</span></td></tr>';
+      html += '<p><span style="font-size:10px; font-style: italic">' + 'Example by ' + author + '</span></td></tr></p>';
       htmlAll.push(html);
   }
   htmlAll.push('</tbody></table>');
@@ -142,25 +130,25 @@ function showPrevious() {
     document.getElementById("nextBUTTON2").disabled = false;
   }
 }
-function createClassSelect() {
-  var classSelect = document.getElementById("classdropdown");
+function createTopicSelect() {
+  var topicSelect = document.getElementById("topicdropdown");
 
-  var classOption = document.createElement("option");
-  classOption.setAttribute("value", '');
+  var topicOption = document.createElement("option");
+  topicOption.setAttribute("value", '');
   var txt = document.createTextNode('');
-  classOption.appendChild(txt);
-  classSelect.appendChild(classOption);
+  topicOption.appendChild(txt);
+  topicSelect.appendChild(topicOption);
 
-  for (var j = 0; j < classes.length; j++){
-    var className = classes[j];
-    var classOption = document.createElement("option");
-    classOption.setAttribute("value",className);
-    var txt = document.createTextNode(className);
-    if(className.toLowerCase() == getURLParam("classname").toLowerCase()) {
-      classOption.setAttribute("selected", true);
+  for (var j = 0; j < topics.length; j++){
+    var topic = topics[j];
+    var topicOption = document.createElement("option");
+    topicOption.setAttribute("value",topic[0]);
+    var txt = document.createTextNode(topic[1]);
+    if(topic[0].toLowerCase() == getURLParam("topic").toLowerCase()) {
+      topicOption.setAttribute("selected", true);
     }
-    classOption.appendChild(txt);
-    classSelect.appendChild(classOption);
+    topicOption.appendChild(txt);
+    topicSelect.appendChild(topicOption);
   }
 }
 
@@ -174,14 +162,14 @@ function cm_getJSON(preferSearch) {
 
   var searchTerm = document.getElementById('searchbox').value;
   if (searchTerm != '' && preferSearch) {
-    document.getElementById('classdropdown').selectedIndex = 0;
+    document.getElementById('topicdropdown').selectedIndex = 0;
     query = '&q=' + searchTerm.toLowerCase();
   }
 
-  var className = document.getElementById('classdropdown').value;
-  if ((className != '' && !preferSearch) || (className != '' && searchTerm == '')) {
+  var topic = document.getElementById('topicdropdown').value;
+  if ((topic != '' && !preferSearch) || (topic != '' && searchTerm == '')) {
     document.getElementById('searchbox').value = '';
-    query = '&sq=' + className.toLowerCase() + '%3Dyes';
+    query = '&sq=topic' + topic.toLowerCase() + '%3Dyes';
   }
   
   try {
@@ -189,9 +177,9 @@ function cm_getJSON(preferSearch) {
   } catch(err) {
   }
   var script = document.createElement('script');
-  script.setAttribute('src', 'http://spreadsheets.google.com/feeds/list/o03712292828507838454.7466931754443925657/od6/public/values' +
+  script.setAttribute('src', 'http://spreadsheets.google.com/feeds/list/o10723659631479505018.5619513878464301518/od6/public/values' +
                         '?reverse=true'+ query + 
-                        '&alt=json-in-script&callback=cm_loadMapJSON');
+                        '&alt=json-in-script&callback=cm_loadSamplesJSON');
   script.setAttribute('id', 'jsonScript');
   script.setAttribute('type', 'text/javascript');
   document.documentElement.firstChild.appendChild(script);
@@ -209,7 +197,7 @@ function cm_getJSON(preferSearch) {
 <form action="demogallery.html" onsubmit="cm_getJSON(true); return false;" method="get">
 Enter keyword <input type="text" id="searchbox" value="" /> <input type="submit" value="Search" onclick="cm_getJSON(true)" />
 
- or select a class <select id="classdropdown" onchange="cm_getJSON(false)"></select>
+ or select a topic <select id="topicdropdown" onchange="cm_getJSON(false)"></select>
 </form>
 <br/><br/>
 <input type="button" onclick="showPrevious()" value="Previous" id="previousBUTTON"/>
