@@ -70,6 +70,9 @@ function DS_goDirections() {
   $('#route-details').html(
       '<span class="loading">Loading directions...</span>');
   
+  if (DS_directions)
+    DS_directions.clear();
+
   DS_directions = new google.maps.Directions(DS_map, null);
   
   google.maps.Event.addListener(DS_directions, 'load', DS_directionsLoaded);
