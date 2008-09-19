@@ -16,7 +16,7 @@ var href = window.location.href;
 var pagePath = href.substring(0, href.lastIndexOf('/')) + '/';
 
 var icon = ge.createIcon('');
-icon.setHref(pagePath + "frame.png");  // Loads an gilded picture frame.
+icon.setHref('http://earth-api-samples.googlecode.com/svn/trunk/examples/static/frame.png');  // Loads an gilded picture frame.
 screenOverlay.setIcon(icon);
 
 // Position the overlay.  ScreenXY(0,0) is mapped to OverlayXY(0,0)
