@@ -5,9 +5,8 @@
   <title>Google Earth API Samples - Fetch KML (Interactive, Checkboxes)</title>
   <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
   <style type="text/css">@import "static/examples.css";</style>
-  <style type="text/css">@import "static/dp.SyntaxHighlighter/Styles/SyntaxHighlighter.css";</style>
-  <script type="text/javascript" src="static/dp.SyntaxHighlighter/Scripts/shCore.js"></script>
-  <script type="text/javascript" src="static/dp.SyntaxHighlighter/Scripts/shBrushJScript.js"></script>
+  <style type="text/css">@import "static/prettify/prettify.css";</style>
+  <script type="text/javascript" src="static/prettify/prettify.js"></script>
   <script type="text/javascript" src="http://www.google.com/jsapi?hl=en&amp;key=ABQIAAAAwbkbZLyhsmTCWXbTcjbgbRSzHs7K5SvaUdm8ua-Xxy_-2dYwMxQMhnagaawTo7L1FE1-amhuQxIlXw"></script>
   <script type="text/javascript">
   /* <![CDATA[ */
@@ -60,10 +59,11 @@
     if (document.getElementById('kml-green-check').checked)
       loadKml('green');
     
+    document.getElementById('installed-plugin-version').innerHTML =
+      ge.getPluginVersion().toString();
   }
   
-  function failureCB() {
-    alert('Google earth loading failed!');
+  function failureCB(errorCode) {
   }
   
   function toggleKml(file) {
@@ -106,10 +106,11 @@
   /* ]]> */
   </script>
 </head>
-<body onload="init();">
+<body onload="prettyPrint();init();">
   <h1>Google Earth API Samples - Fetch KML (Interactive, Checkboxes)</h1>
   <dl>
-            <dt>Last Modified:</dt><dd>08/04/08</dd>
+            <dt>Last Modified:</dt><dd>10/23/2008</dd>
+    <dt>Installed Plugin Version:</dt><dd id="installed-plugin-version">...</dd>
   </dl>
   <div style="clear: both;"></div>
   
@@ -128,16 +129,17 @@
 
 <input type="checkbox" id="kml-green-check" onclick="toggleKml('green');"/>
 <label for="kml-green-check">Green Placemarks</label><br/>
+      <h2>Relevant Resources:</h2>
+      <ul>
+<li><a href="http://code.google.com/apis/earth/documentation/reference/google_earth_namespace.html">google.earth Namespace Reference</a></li>
+<li><a href="http://code.google.com/apis/earth/documentation/reference/interface_g_e_plugin.html">GEPlugin Reference</a></li>
+<li><a href="http://code.google.com/apis/earth/documentation/reference/interface_g_e_feature_container-members.html">GEFeatureContainer Members</a></li>
+<li><a href="http://code.google.com/apis/kml/documentation/kmlreference.html">KML Reference</a></li>
+      </ul>
       <h2>Relevant Code Excerpt:</h2>
-      <pre name="code" class="jscript">
-// The source for this example is too large to show as a code excerpt.
-// Please view the entire page source.
-      </pre>
+      <pre id="code-excerpt" class="prettyprint lang-js">// The source for this example is too large to show as a code excerpt.
+// Please view the entire page source.</pre>
     </div>
   </div>
-  <script type="text/javascript">
-  dp.SyntaxHighlighter.ClipboardSwf = 'dp.SyntaxHighlighter/Scripts/clipboard.swf';
-  dp.SyntaxHighlighter.HighlightAll('code');
-  </script>
 </body>
 </html>

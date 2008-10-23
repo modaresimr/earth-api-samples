@@ -5,9 +5,8 @@
   <title>Google Earth API Samples - Creating 3D Models</title>
   <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
   <style type="text/css">@import "static/examples.css";</style>
-  <style type="text/css">@import "static/dp.SyntaxHighlighter/Styles/SyntaxHighlighter.css";</style>
-  <script type="text/javascript" src="static/dp.SyntaxHighlighter/Scripts/shCore.js"></script>
-  <script type="text/javascript" src="static/dp.SyntaxHighlighter/Scripts/shBrushJScript.js"></script>
+  <style type="text/css">@import "static/prettify/prettify.css";</style>
+  <script type="text/javascript" src="static/prettify/prettify.js"></script>
   <script type="text/javascript" src="http://www.google.com/jsapi?hl=en&amp;key=ABQIAAAAwbkbZLyhsmTCWXbTcjbgbRSzHs7K5SvaUdm8ua-Xxy_-2dYwMxQMhnagaawTo7L1FE1-amhuQxIlXw"></script>
   <script type="text/javascript">
   /* <![CDATA[ */
@@ -35,10 +34,11 @@
     
     create3dModel();
     
+    document.getElementById('installed-plugin-version').innerHTML =
+      ge.getPluginVersion().toString();
   }
   
-  function failureCB() {
-    alert('Google earth loading failed!');
+  function failureCB(errorCode) {
   }
   
   function create3dModel() {
@@ -61,7 +61,7 @@
     // A textured model created in Sketchup and exported as Collada.
     var href = window.location.href;
     var pagePath = href.substring(0, href.lastIndexOf('/')) + '/';
-    link.setHref(pagePath + 'static/splotchy_box.dae.xml');
+    link.setHref(pagePath + 'static/splotchy_box.dae');
     model.setLink(link);
   
     la = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
@@ -82,10 +82,11 @@
   /* ]]> */
   </script>
 </head>
-<body onload="init();">
+<body onload="prettyPrint();init();">
   <h1>Google Earth API Samples - Creating 3D Models</h1>
   <dl>
-            <dt>Last Modified:</dt><dd>08/04/08</dd>
+            <dt>Last Modified:</dt><dd>10/23/2008</dd>
+    <dt>Installed Plugin Version:</dt><dd id="installed-plugin-version">...</dd>
   </dl>
   <div style="clear: both;"></div>
   
@@ -97,45 +98,45 @@
     <div id="extra-ui" style="position: absolute; left: 520px; top: 0;">
       <input type="button" onclick="buttonClick()" value="Load the 3D Model Again!"/>
       
+      <h2>Relevant Resources:</h2>
+      <ul>
+<li><a href="http://code.google.com/apis/earth/documentation/reference/interface_kml_model.html">KmlModel Reference</a></li>
+<li><a href="http://code.google.com/apis/earth/documentation/reference/interface_kml_location.html">KmlLocation Reference</a></li>
+<li><a href="http://code.google.com/apis/earth/documentation/reference/interface_kml_placemark.html">KmlPlacemark Reference</a></li>
+      </ul>
       <h2>Relevant Code Excerpt:</h2>
-      <pre name="code" class="jscript">
-  // Create a 3D model, initialize it from a Collada file, and place it
-  // in the world.
+      <pre id="code-excerpt" class="prettyprint lang-js">// Create a 3D model, initialize it from a Collada file, and place it
+// in the world.
 
-  // ===================================================================
-  // NOTE: This sample will not work if the page is loaded from local 
-  // disk (file://C/PATH...) because the Earth Browser Plug-in does not
-  // support loading local files from disk, for security reasons.
-  // ===================================================================
-  placemark = ge.createPlacemark('');
-  placemark.setName('model');
-  model = ge.createModel('');
-  ge.getFeatures().appendChild(placemark);
-  loc = ge.createLocation('');
-  model.setLocation(loc);
-  link = ge.createLink('');
+// ===================================================================
+// NOTE: This sample will not work if the page is loaded from local 
+// disk (file://C/PATH...) because the Earth Browser Plug-in does not
+// support loading local files from disk, for security reasons.
+// ===================================================================
+placemark = ge.createPlacemark('');
+placemark.setName('model');
+model = ge.createModel('');
+ge.getFeatures().appendChild(placemark);
+loc = ge.createLocation('');
+model.setLocation(loc);
+link = ge.createLink('');
 
-  // A textured model created in Sketchup and exported as Collada.
-  var href = window.location.href;
-  var pagePath = href.substring(0, href.lastIndexOf('/')) + '/';
-  link.setHref(pagePath + 'static/splotchy_box.dae.xml');
-  model.setLink(link);
+// A textured model created in Sketchup and exported as Collada.
+var href = window.location.href;
+var pagePath = href.substring(0, href.lastIndexOf('/')) + '/';
+link.setHref(pagePath + 'static/splotchy_box.dae');
+model.setLink(link);
 
-  la = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
-  loc.setLatitude(la.getLatitude());
-  loc.setLongitude(la.getLongitude());
+la = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
+loc.setLatitude(la.getLatitude());
+loc.setLongitude(la.getLongitude());
 
-  placemark.setGeometry(model);
+placemark.setGeometry(model);
 
-  la.setRange(300);
-  la.setTilt(45);
-  ge.getView().setAbstractView(la);
-      </pre>
+la.setRange(300);
+la.setTilt(45);
+ge.getView().setAbstractView(la);</pre>
     </div>
   </div>
-  <script type="text/javascript">
-  dp.SyntaxHighlighter.ClipboardSwf = 'dp.SyntaxHighlighter/Scripts/clipboard.swf';
-  dp.SyntaxHighlighter.HighlightAll('code');
-  </script>
 </body>
 </html>

@@ -5,9 +5,8 @@
   <title>Google Earth API Samples - Creating Ground Overlays</title>
   <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
   <style type="text/css">@import "static/examples.css";</style>
-  <style type="text/css">@import "static/dp.SyntaxHighlighter/Styles/SyntaxHighlighter.css";</style>
-  <script type="text/javascript" src="static/dp.SyntaxHighlighter/Scripts/shCore.js"></script>
-  <script type="text/javascript" src="static/dp.SyntaxHighlighter/Scripts/shBrushJScript.js"></script>
+  <style type="text/css">@import "static/prettify/prettify.css";</style>
+  <script type="text/javascript" src="static/prettify/prettify.js"></script>
   <script type="text/javascript" src="http://www.google.com/jsapi?hl=en&amp;key=ABQIAAAAwbkbZLyhsmTCWXbTcjbgbRSzHs7K5SvaUdm8ua-Xxy_-2dYwMxQMhnagaawTo7L1FE1-amhuQxIlXw"></script>
   <script type="text/javascript">
   /* <![CDATA[ */
@@ -37,10 +36,11 @@
     
     createGroundOverlay();
     
+    document.getElementById('installed-plugin-version').innerHTML =
+      ge.getPluginVersion().toString();
   }
   
-  function failureCB() {
-    alert('Google earth loading failed!');
+  function failureCB(errorCode) {
   }
   
   function createGroundOverlay() {
@@ -69,10 +69,11 @@
   /* ]]> */
   </script>
 </head>
-<body onload="init();">
+<body onload="prettyPrint();init();">
   <h1>Google Earth API Samples - Creating Ground Overlays</h1>
   <dl>
-            <dt>Last Modified:</dt><dd>08/04/08</dd>
+            <dt>Last Modified:</dt><dd>10/23/2008</dd>
+    <dt>Installed Plugin Version:</dt><dd id="installed-plugin-version">...</dd>
   </dl>
   <div style="clear: both;"></div>
   
@@ -84,30 +85,29 @@
     <div id="extra-ui" style="position: absolute; left: 520px; top: 0;">
       <input type="button" onclick="buttonClick()" value="Create Another Ground Overlay!"/>
       
+      <h2>Relevant Resources:</h2>
+      <ul>
+<li><a href="http://code.google.com/apis/earth/documentation/reference/interface_kml_ground_overlay.html">KmlGroundOverlay Reference</a></li>
+<li><a href="http://code.google.com/apis/earth/documentation/reference/interface_kml_icon.html">KmlIcon Reference</a></li>
+      </ul>
       <h2>Relevant Code Excerpt:</h2>
-      <pre name="code" class="jscript">
-  var groundOverlay = ge.createGroundOverlay('');
-  groundOverlay.setIcon(ge.createIcon(''))
-  groundOverlay.getIcon().
-    setHref(&quot;http://www.google.com/intl/en_ALL/images/logo.gif&quot;);
-  groundOverlay.setLatLonBox(ge.createLatLonBox(''));
+      <pre id="code-excerpt" class="prettyprint lang-js">var groundOverlay = ge.createGroundOverlay('');
+groundOverlay.setIcon(ge.createIcon(''))
+groundOverlay.getIcon().
+  setHref(&quot;http://www.google.com/intl/en_ALL/images/logo.gif&quot;);
+groundOverlay.setLatLonBox(ge.createLatLonBox(''));
 
-  var center = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
-  var north = center.getLatitude() + .35;
-  var south = center.getLatitude() - .35;
-  var east = center.getLongitude() + .55;
-  var west = center.getLongitude() - .55;
-  var rotation = 0;
-  var latLonBox = groundOverlay.getLatLonBox();
-  latLonBox.setBox(north, south, east, west, rotation);
+var center = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
+var north = center.getLatitude() + .35;
+var south = center.getLatitude() - .35;
+var east = center.getLongitude() + .55;
+var west = center.getLongitude() - .55;
+var rotation = 0;
+var latLonBox = groundOverlay.getLatLonBox();
+latLonBox.setBox(north, south, east, west, rotation);
 
-  ge.getFeatures().appendChild(groundOverlay);
-      </pre>
+ge.getFeatures().appendChild(groundOverlay);</pre>
     </div>
   </div>
-  <script type="text/javascript">
-  dp.SyntaxHighlighter.ClipboardSwf = 'dp.SyntaxHighlighter/Scripts/clipboard.swf';
-  dp.SyntaxHighlighter.HighlightAll('code');
-  </script>
 </body>
 </html>
