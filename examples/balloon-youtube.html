@@ -2,7 +2,7 @@
 "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
-  <title>Google Earth API Samples - HTML String Balloons</title>
+  <title>Google Earth API Samples - YouTube Embed (HTML String) Balloons</title>
   <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
   <style type="text/css">@import "static/examples.css";</style>
   <style type="text/css">@import "static/prettify/prettify.css";</style>
@@ -52,6 +52,27 @@
       5000 // range (inverse of zoom)
       );
     ge.getView().setAbstractView(la);
+    placemark.setName('Click for a YouTube video!');
+    
+    google.earth.addEventListener(placemark, 'click', function(event) {
+      // prevent the default balloon from popping up
+      event.preventDefault();
+      
+      var balloon = ge.createHtmlStringBalloon('');
+      balloon.setFeature(placemark); // optional
+      balloon.setMaxWidth(400);
+      
+      // YouTube video embed... the &nbsp; in the beginning is a fix for IE6
+      balloon.setContentString(
+          '&nbsp;<object width="400" height="300"><param name="movie" '
+          + 'value="http://www.youtube.com/v/6mrG_bsqC6k&hl=en&fs=1"/>'
+          + '<param name="allowFullScreen" value="true"/>'
+          + '<embed src="http://www.youtube.com/v/6mrG_bsqC6k&hl=en&fs=1" '
+          + 'type="application/x-shockwave-flash" allowfullscreen="true" '
+          + 'width="400" height="300"></embed></object>');
+      
+      ge.setBalloon(balloon);
+    });
     
     document.getElementById('installed-plugin-version').innerHTML =
       ge.getPluginVersion().toString();
@@ -60,25 +81,11 @@
   function failureCB(errorCode) {
   }
   
-  function buttonClick() {
-    var balloon = ge.createHtmlStringBalloon('');
-    balloon.setFeature(placemark); // optional
-    balloon.setMaxWidth(300);
-    
-    // Google logo.
-    balloon.setContentString(
-        '<img src="http://www.google.com/intl/en_ALL/images/logo.gif"><br>'
-        + '<font size=20>Earth Plugin</font><br><font size=-2>sample info '
-        + 'window</font>');
-    
-    ge.setBalloon(balloon);
-  }
-  
   /* ]]> */
   </script>
 </head>
 <body onload="if(window.prettyPrint)prettyPrint();init();">
-  <h1>Google Earth API Samples - HTML String Balloons</h1>
+  <h1>Google Earth API Samples - YouTube Embed (HTML String) Balloons</h1>
   <dl>
             <dt>Last Modified:</dt><dd>10/31/2008</dd>
     <dt>Installed Plugin Version:</dt><dd id="installed-plugin-version">...</dd>
@@ -91,25 +98,31 @@
     </div>
   
     <div id="extra-ui" style="position: absolute; left: 520px; top: 0;">
-      <input type="button" onclick="buttonClick()" value="Show an HTML String Balloon!"/>
-      
       <h2>Relevant Resources:</h2>
       <ul>
 <li><a href="http://code.google.com/apis/earth/documentation/reference/interface_g_e_html_string_balloon.html">GEHtmlStringBalloon Reference</a></li>
 <li><a href="http://code.google.com/apis/earth/documentation/reference/interface_g_e_plugin.html">GEPlugin Reference</a></li>
       </ul>
       <h2>Relevant Code Excerpt:</h2>
-      <pre class="prettyprint lang-js">var balloon = ge.createHtmlStringBalloon('');
-balloon.setFeature(placemark); // optional
-balloon.setMaxWidth(300);
-
-// Google logo.
-balloon.setContentString(
-    '&lt;img src=&quot;http://www.google.com/intl/en_ALL/images/logo.gif&quot;&gt;&lt;br&gt;'
-    + '&lt;font size=20&gt;Earth Plugin&lt;/font&gt;&lt;br&gt;&lt;font size=-2&gt;sample info '
-    + 'window&lt;/font&gt;');
-
-ge.setBalloon(balloon);</pre>
+      <pre class="prettyprint lang-js">google.earth.addEventListener(placemark, 'click', function(event) {
+  // prevent the default balloon from popping up
+  event.preventDefault();
+  
+  var balloon = ge.createHtmlStringBalloon('');
+  balloon.setFeature(placemark); // optional
+  balloon.setMaxWidth(400);
+  
+  // YouTube video embed... the &amp;nbsp; in the beginning is a fix for IE6
+  balloon.setContentString(
+      '&amp;nbsp;&lt;object width=&quot;400&quot; height=&quot;300&quot;&gt;&lt;param name=&quot;movie&quot; '
+      + 'value=&quot;http://www.youtube.com/v/6mrG_bsqC6k&amp;hl=en&amp;fs=1&quot;/&gt;'
+      + '&lt;param name=&quot;allowFullScreen&quot; value=&quot;true&quot;/&gt;'
+      + '&lt;embed src=&quot;http://www.youtube.com/v/6mrG_bsqC6k&amp;hl=en&amp;fs=1&quot; '
+      + 'type=&quot;application/x-shockwave-flash&quot; allowfullscreen=&quot;true&quot; '
+      + 'width=&quot;400&quot; height=&quot;300&quot;&gt;&lt;/embed&gt;&lt;/object&gt;');
+  
+  ge.setBalloon(balloon);
+});</pre>
     </div>
   </div>
 </body>
