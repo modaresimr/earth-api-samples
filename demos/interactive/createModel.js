@@ -17,7 +17,7 @@ link = ge.createLink('');
 
 // A textured model created in Sketchup and exported as Collada.
 var href = window.location.href;
-link.setHref('http://earth-api-samples.googlecode.com/svn/trunk/examples/static/splotchy_box.dae.xml');
+link.setHref('http://earth-api-samples.googlecode.com/svn/trunk/examples/static/splotchy_box.dae');
 model.setLink(link);
 
 la = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
