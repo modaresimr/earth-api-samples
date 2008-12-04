@@ -1,31 +1,27 @@
 if (!window.placemark) {
-  alert('placemark not defined');
+  alert('No placemark; run one of the placemark samples first.');
 } else {
-  // Apply stylemap to a placemark
-  counter++;
-  map = ge.createStyleMap('styleMap' + counter);
-  
-  // Create icon normal for style map
-  normal = ge.createIcon('');
-  normal.setHref('http://maps.google.com/mapfiles/kml/shapes/triangle.png');
-  iconNormal = ge.createStyle('styleIconNormal' + counter);
-  iconNormal.getIconStyle().setIcon(normal);
+  // create a normal style
+  var normalIcon = ge.createIcon('');
+  normalIcon.setHref('http://maps.google.com/mapfiles/kml/shapes/triangle.png');
+  var normalStyle = ge.createStyle('');
+  normalStyle.getIconStyle().setIcon(normalIcon);
 
-  // Create icon highlight for style map
-  highlight = ge.createIcon('');
-  highlight.setHref('http://maps.google.com/mapfiles/kml/shapes/square.png');
-  iconHighlight = ge.createStyle('styleIconHighlight' + counter);
-  iconHighlight.getIconStyle().setIcon(highlight);
+  // create a highlight style that changes the placemark's icon,
+  // line color, and polygon fill color if it has them
+  var highlightIcon = ge.createIcon('');
+  highlightIcon.setHref('http://maps.google.com/mapfiles/kml/shapes/square.png');
+  var highlightStyle = ge.createStyle('');
+  highlightStyle.getLineStyle().getColor().set('ff00ffff'); // aabbggrr format
+  highlightStyle.getLineStyle().setWidth(5);
+  highlightStyle.getPolyStyle().getColor().set('ffffff00'); // aabbggrr format
+  highlightStyle.getIconStyle().setIcon(highlightIcon);
 
-  // Set normal and highlight icons for stylemap.
-  // This is different than creating a style map in createplacemark.js.
-  // This example uses a url rather than a style.
-  map.setNormalStyleUrl('#styleIconNormal' + counter);
-  map.setHighlightStyleUrl('#styleIconHighlight' + counter);
+  // create a KmlStyleMap and set its normal and highlight styles
+  var styleMap = ge.createStyleMap('');
+  styleMap.setNormalStyle(normalStyle);
+  styleMap.setHighlightStyle(highlightStyle);
 
-  // Apply stylemap to placemark. Ensure that the inline style
-  // selector is null since an inline style selector takes 
-  // precedence over shared styles.
-  placemark.setStyleSelector(null);  // inline style
-  placemark.setStyleUrl('#styleMap' + counter);  // shared style
+  // apply the style map to the placemark
+  placemark.setStyleSelector(styleMap);
 }

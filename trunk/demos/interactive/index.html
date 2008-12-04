@@ -50,14 +50,24 @@ function addSampleHeader(text) {
 }
 
 function addSample(description, url) {
+  var indent = false;
+  if (description.substr(0,2) == '> ') {
+    description = description.substr(2);
+    indent = true;
+  }
+  
   var num = samples.length;
   samples.push(new Sample(description, url));
   el('samples').innerHTML += 
     '<div class="run_sample">' +
     '  <a href="javascript:loadSample(' + num + ', true);void(0);"' +
     ' id="run' + num + '">run</a></div>';
-  el('samples').innerHTML += 
-    '&nbsp;&nbsp;' +
+  
+  var spaces = '&nbsp;&nbsp;'
+  if (indent)
+    spaces = spaces + '&nbsp;&nbsp;&nbsp;&nbsp;'
+  
+  el('samples').innerHTML += spaces +
     '<a href="javascript:loadSample(' + num + ', false);void(0);">' +
       description + 
     '</a><br>';
@@ -66,47 +76,47 @@ function addSample(description, url) {
 
 function init() {
   addSampleHeader('Camera control');
-  addSample('Move camera', 'movecamera.js');
-  addSample('Move camera w/timeouts', 'movecameratimeouts.js');
-  addSample('Tilt view', 'tiltView.js');
+  addSample('Move Camera', 'movecamera.js');
+  addSample('Move Camera (setTimeout)', 'movecameratimeouts.js');
+  addSample('Tilt View', 'tiltView.js');
 
-  addSampleHeader('Placemarks and geometry');
+  addSampleHeader('Placemarks and Geometries');
   addSample('Create Placemark', 'createplacemark.js');
+  addSample('> Placemark StyleMap', 'createstylemap.js');
   addSample('Create ScreenOverlay', 'screenoverlay.js');  
-  addSample('Create ScreenOverlay frame', 'frame.js');  
+  addSample('Create ScreenOverlay (frame)', 'frame.js');  
   addSample('Create LineString', 'createlinestring.js');
-  addSample('LineString style', 'linestringstyle.js');
+  addSample('> LineString Style', 'linestringstyle.js');
   addSample('Create Polygon', 'createpolygon.js');
-  addSample('Polygon style', 'polygonstyle.js');
-  addSample('Placemark StyleMap', 'createstylemap.js');
+  addSample('> Polygon Style', 'polygonstyle.js');
   addSample('Create Polygon (circle)', 'createpolygoncircle.js');
   addSample('Create GroundOverlay', 'groundoverlay.js');
-  addSample('Create 3d model', 'createModel.js');
+  addSample('Create 3D Model', 'createModel.js');
   addSample('Create NetworkLink', 'networklink.js');
   addSample('Create MultiGeometry', 'createmultigeometry.js');
 
   addSampleHeader('Balloons');
-  addSample('Open Feature balloon', 'openBalloon.js');
-  addSample('Open HTML String balloon', 'openHtmlStringBalloon.js');
-  addSample('Open HTML Div balloon', 'openHtmlDivBalloon.js');
-  addSample('Change balloon content', 'changeBalloonContent.js');
-  addSample('Close balloon', 'closeBalloon.js');
+  addSample('Open Feature Balloon', 'openBalloon.js');
+  addSample('Open HTML String Balloon', 'openHtmlStringBalloon.js');
+  addSample('Open HTML Div Balloon', 'openHtmlDivBalloon.js');
+  addSample('Change Balloon Content', 'changeBalloonContent.js');
+  addSample('Close Balloon', 'closeBalloon.js');
 
   addSampleHeader('Events');
-  addSample('Globe/window events', 'globewindowevents.js');
-  addSample('Placemark events', 'placemarkevents.js');
+  addSample('Globe/window Events', 'globewindowevents.js');
+  addSample('Placemark Events', 'placemarkevents.js');
 
   addSampleHeader('KML');
   addSample('Parse KML (Pentagon)', 'pentagon.js');
-  addSample('Fetch bad kml link', 'badfetch.js');
-  addSample('Fetch good kml', 'goodfetch1.js');
+  addSample('Fetch Bad KML link', 'badfetch.js');
+  addSample('Fetch Good KML link', 'goodfetch1.js');
 
   addSampleHeader('Misc');
-  addSample('Toggle Sky mode', 'togglesky.js');
-  addSample('Toggle terrain', 'terrain.js');
-  addSample('Toggle buildings', 'togglebuildings.js');
-  addSample('Test navigation control', 'navcontrol.js');
-  addSample('GMapsAPI geocoder', 'geocode.js');
+  addSample('Toggle Sky Mode', 'togglesky.js');
+  addSample('Toggle Terrain', 'terrain.js');
+  addSample('Toggle Buildings', 'togglebuildings.js');
+  addSample('Test Navigation Control', 'navcontrol.js');
+  addSample('Maps API Geocoder', 'geocode.js');
 
   log('<span style="color:#999"><i>' +
       'Use log(string or number or object) to write ' +

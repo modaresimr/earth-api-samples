@@ -1,22 +1,10 @@
-// ===================================================================
-// NOTE: This sample will not work if the page is loaded from local 
-// disk (file://C/PATH...) because the Earth Browser Plug-in does not
-// support loading local files from disk, for security reasons.
-// ===================================================================
-
-var screenOverlay = ge.createScreenOverlay('');
-
-// Set the visibility to false while we construct the overlay.
-screenOverlay.setVisibility(false);
-
-// The plugin currently only accepts absolute URLs, so we retrieve the
-// URL of the current page in order to construct an absolute URL for
-// the PNG file we are about to fetch.
-var href = window.location.href;
-var pagePath = href.substring(0, href.lastIndexOf('/')) + '/';
-
+// create an image for the screen overlay
 var icon = ge.createIcon('');
-icon.setHref('http://earth-api-samples.googlecode.com/svn/trunk/examples/static/frame.png');  // Loads an gilded picture frame.
+icon.setHref('http://earth-api-samples.googlecode.com/svn/trunk/' +
+             'examples/static/frame.png');  // Loads an gilded picture frame.
+
+// create the screen overlay
+var screenOverlay = ge.createScreenOverlay('');
 screenOverlay.setIcon(icon);
 
 // Position the overlay.  ScreenXY(0,0) is mapped to OverlayXY(0,0)
@@ -40,6 +28,5 @@ overlaySize.setYUnits(ge.UNITS_FRACTION);
 overlaySize.setX(1);
 overlaySize.setY(1);
 
-screenOverlay.setVisibility(true);
-
+// add the screen overlay to Earth
 ge.getFeatures().appendChild(screenOverlay);

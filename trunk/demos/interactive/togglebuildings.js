@@ -21,7 +21,8 @@ var la = ge.createLookAt('');
 la.set(37.79333, -122.40, 0, ge.ALTITUDE_RELATIVE_TO_GROUND, 0, 70, 1000);
 ge.getView().setAbstractView(la);      
 
-// Spin the camera around downtown San Francisco
+// Spin the camera around downtown San Francisco 10 seconds later
+// to give time for the buildings to load
 setTimeout(function() {
              var la = ge.createLookAt('');         
              la.set(37.79333, -122.40, 0, ge.ALTITUDE_RELATIVE_TO_GROUND, 
