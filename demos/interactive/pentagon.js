@@ -1,6 +1,6 @@
 // Sample KML taken from 
 //   http://code.google.com/apis/kml/documentation/kml_tut.html#polygons
-var pentagon = ge.parseKml(
+var pentagonPlacemark = ge.parseKml(
   '<?xml version="1.0" encoding="UTF-8"?>' +
   '<kml xmlns="http://earth.google.com/kml/2.1">' +
   '  <Placemark>' +
@@ -36,9 +36,11 @@ var pentagon = ge.parseKml(
   '  </Placemark>' +
   '</kml>');
 
-ge.getFeatures().appendChild(pentagon);
+// pentagonPlacemark will be of type KmlPlacemark because the top-level
+// KML object is a Placemark
+ge.getFeatures().appendChild(pentagonPlacemark);
 
 // Fly to the Pentagon
-var la = ge.createLookAt('');
-la.set(38.867, -77.0565, 500, ge.ALTITUDE_RELATIVE_TO_GROUND, 0, 45, 900);
-ge.getView().setAbstractView(la);
+var lookAt = ge.createLookAt('');
+lookAt.set(38.867, -77.0565, 500, ge.ALTITUDE_RELATIVE_TO_GROUND, 0, 45, 900);
+ge.getView().setAbstractView(lookAt);

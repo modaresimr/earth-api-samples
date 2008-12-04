@@ -1,16 +1,16 @@
 if (!window.placemark) {
-  alert('Run "Create Placemark" sample first.');
+  alert('No placemark; run one of the placemark samples first.');
 } else {
-  window.geEventListener = function(event) {
+  // event listeners can use any functions, even anonymous functions
+  google.earth.addEventListener(placemark, 'click', function(event) {
     var text = 'Click:';
 
     function addToMessage(append1, append2) { 
-     text += ' ' + append1 + ': ' + append2 + '<br>\n' ;
+      text += ' ' + append1 + ': ' + append2 + '\n' ;
     }
 
     addToMessage('target type', event.getTarget().getType());
-    addToMessage('currentTarget type', 
-                 event.getCurrentTarget().getType());
+    addToMessage('currentTarget type', event.getCurrentTarget().getType());
     addToMessage('button', event.getButton());
     addToMessage('clientX', event.getClientX());
     addToMessage('clientY', event.getClientY());
@@ -29,8 +29,5 @@ if (!window.placemark) {
     event.preventDefault(); 
 
     log(text);
-  }
-
-  google.earth.addEventListener(placemark, "click", 
-                                window.geEventListener);
+  });
 }

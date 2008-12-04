@@ -1,5 +1,4 @@
 // Toggle terrain (altitude of ground plane, such as mountains) on and off
-
 var oldFlyToSpeed = ge.getOptions().getFlyToSpeed();
 ge.getOptions().setFlyToSpeed(ge.SPEED_TELEPORT); 
 

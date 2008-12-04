@@ -1,5 +1,4 @@
-// Create a 3D model, initialize it from a Collada file, and place it
-// in the world.
+// Create a 3D model from a Collada file, and place it on Earth
 
 // ===================================================================
 // NOTE: This sample will not work if the page is loaded from local 
@@ -7,25 +6,34 @@
 // support loading local files from disk, for security reasons.
 // ===================================================================
 
-placemark = ge.createPlacemark('');
-placemark.setName('model');
-model = ge.createModel('');
-ge.getFeatures().appendChild(placemark);
-loc = ge.createLocation('');
+// get the current camera location
+var lookAt = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
+
+// create the model geometry
+var model = ge.createModel('');
+
+// set up the model's location
+var loc = ge.createLocation('');
+loc.setLatitude(lookAt.getLatitude());
+loc.setLongitude(lookAt.getLongitude());
 model.setLocation(loc);
-link = ge.createLink('');
 
-// A textured model created in Sketchup and exported as Collada.
-var href = window.location.href;
-link.setHref('http://earth-api-samples.googlecode.com/svn/trunk/examples/static/splotchy_box.dae');
+// set up the model's link (must be a COLLADA file).
+// this model was created in SketchUp
+var link = ge.createLink('');
 model.setLink(link);
+link.setHref('http://earth-api-samples.googlecode.com/svn/trunk/' +
+             'examples/static/splotchy_box.dae');
 
-la = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
-loc.setLatitude(la.getLatitude());
-loc.setLongitude(la.getLongitude());
+// create the model placemark and add it to Earth
+var modelPlacemark = ge.createPlacemark('');
+modelPlacemark.setGeometry(model);
+ge.getFeatures().appendChild(modelPlacemark);
 
-placemark.setGeometry(model);
+// zoom in on the model
+lookAt.setRange(300);
+lookAt.setTilt(80);
+ge.getView().setAbstractView(lookAt);
 
-la.setRange(300);
-la.setTilt(80);
-ge.getView().setAbstractView(la);
+// persist the placemark for other interactive samples
+window.placemark = modelPlacemark;

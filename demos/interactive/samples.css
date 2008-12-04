@@ -87,3 +87,8 @@ form {
   padding-top: 6px;
   font-weight: bold;
 }
+
+#sample_code {
+  font-family: monospace;
+  font-size: 10pt;
+}
