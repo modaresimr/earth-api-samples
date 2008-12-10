@@ -60,7 +60,7 @@ function cm_loadSamplesJSON(json) {
   feed = json.feed;
   curNum = 0;
   if ( !feed.entry) {
-    document.getElementById("sidebar").innerHTML = "Try again!";
+    document.getElementById("sidebar").innerHTML = "No results.";
   } 
   updateGallery();
     
@@ -201,7 +201,6 @@ function cm_getJSON(preferSearch) {
   script.setAttribute('src', 'http://spreadsheets.google.com/feeds/list/pekCIUp4X0pTOCT5YGYb8TQ/od6/public/values' +
                         queryAndSort + 
                         '&alt=json-in-script&callback=cm_loadSamplesJSON');
-                        console.log(script.getAttribute('src'));
   script.setAttribute('id', 'jsonScript');
   script.setAttribute('type', 'text/javascript');
   document.documentElement.firstChild.appendChild(script);
@@ -225,10 +224,9 @@ Enter keyword <input type="text" id="searchbox" value="" /> <input type="submit"
 <input type="button" onclick="showPrevious()" value="Previous" id="previousBUTTON"/>
 <input type="button" onclick="showNext()" value="Next" id="nextBUTTON"/>
 <br/>
-<div id="sidebar"></div>
+<div id="sidebar">Loading...</div>
 <br/>
 <input type="button" onclick="showPrevious()" value="Previous" id="previousBUTTON2"/>
 <input type="button" onclick="showNext()" value="Next" id="nextBUTTON2"/>
-<p><img src="http://code.google.com/images/tearoff_icon.gif" style="border: 0;" alt="External"/> <em>Links with this icon go to an external site.</em></p>
 </body> </html>
 
