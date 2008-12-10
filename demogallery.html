@@ -9,6 +9,9 @@
     border: none;
     background-color: #eee;
   }
+  tr.external td {
+    background-color: #ddf;
+  }
   img { 
     border: 1px solid #888;
   }
@@ -28,7 +31,8 @@ var topics = [
   ['balloon', 'Balloon Windows'],
   ['view', 'LookAt and Camera'],
   ['events', 'Events'],
-  ['networklink', 'Network Links']
+  ['networklink', 'Network Links'],
+  ['sky', 'Sky Mode']
 ];
 
 topics = topics.sort()
@@ -82,27 +86,40 @@ function updateGallery() {
   for (var i = min; i < max; i++) {
       var entry = feed.entry[i];
       var title = entry.gsx$title.$t;
+      
       var author = entry.gsx$author.$t;
+      var authorurl = entry.gsx$authorurl.$t;
+      var external = (entry.gsx$external.$t.toLowerCase() == 'yes');
+      
       var description = entry.gsx$description.$t;
       var thumbnailurl = entry.gsx$thumbnailurl.$t;
       var srcurl = entry.gsx$srcurl.$t;
+      
       var url = entry.gsx$url.$t;
       var topicsUsed = [];
       for (var j = 0; j < topics.length; j++) {
         var topicColumnName = 'gsx$topic' + topics[j][0].toLowerCase();
-        if (entry[topicColumnName] && entry[topicColumnName].$t.toLowerCase() == 'yes') {
+        if (entry[topicColumnName] && entry[topicColumnName].$t.replace(/\s/g, '') != '') {
           topicsUsed.push(topics[j][1]);
         }
       }
-      var html = '<tr><td><a target="_blank" href="' + url + '">' +
+      var html = '<tr class="' + (external ? 'external' : 'internal') + '">' + '<td><a target="_blank" href="' + url + '">' +
         '<img style="width: 160px; height: 128px" src="' + thumbnailurl + '"/></a></td>' +
-        '<td valign="top"><strong><a target="_blank" href="' + url + '">' + title + '</a></strong>' +
+        '<td valign="top">' +
+        
+        '<strong>' +
+        '<a target="_blank" href="' + url + '">' + title + '</a>' +
+        '<span style="font-style: italic;">' +
+        (external ? ' Community Demo' : '') + ' by ' +
+        (authorurl ? '<a href="' + authorurl + '">' + author + '</a>' : author) +
+        '</span></strong>' +
+        
         (srcurl ? '<p style="margin-top: 0; font-size: 10px; font-style: italic;"><a target="_blank" href="' + srcurl + '">See full source</a></p>' : '') +
         '<p>' + description + '</p>';
       if (topicsUsed.length > 0) {
         html += '<p>Topics covered: <em>' + topicsUsed.join(', ') + '</em></p>';
       }
-      html += '<p><span style="font-size:10px; font-style: italic">' + 'Example by ' + author + '</span></td></tr></p>';
+      html += '</td></tr>';
       htmlAll.push(html);
   }
   htmlAll.push('</tbody></table>');
@@ -158,18 +175,22 @@ function createTopicSelect() {
  * Once loaded, it calls cm_loadMapJSON.
  */
 function cm_getJSON(preferSearch) {
-  var query = '';
+  var queryAndSort = '?reverse=true&orderby=column:generalweight';
 
   var searchTerm = document.getElementById('searchbox').value;
   if (searchTerm != '' && preferSearch) {
     document.getElementById('topicdropdown').selectedIndex = 0;
-    query = '&q=' + searchTerm.toLowerCase();
+    queryAndSort = '?reverse=true' +
+                   '&orderby=column:generalweight' +
+                   '&q=' + searchTerm.toLowerCase();
   }
 
   var topic = document.getElementById('topicdropdown').value;
   if ((topic != '' && !preferSearch) || (topic != '' && searchTerm == '')) {
     document.getElementById('searchbox').value = '';
-    query = '&sq=topic' + topic.toLowerCase() + '%3Dyes';
+    queryAndSort = '?reverse=true' +
+                   '&orderby=column:topic' + topic.toLowerCase() +
+                   '&sq=topic' + topic.toLowerCase() + '%21%3D0';
   }
   
   try {
@@ -177,9 +198,10 @@ function cm_getJSON(preferSearch) {
   } catch(err) {
   }
   var script = document.createElement('script');
-  script.setAttribute('src', 'http://spreadsheets.google.com/feeds/list/o10723659631479505018.5619513878464301518/od6/public/values' +
-                        '?reverse=true'+ query + 
+  script.setAttribute('src', 'http://spreadsheets.google.com/feeds/list/pekCIUp4X0pTOCT5YGYb8TQ/od6/public/values' +
+                        queryAndSort + 
                         '&alt=json-in-script&callback=cm_loadSamplesJSON');
+                        console.log(script.getAttribute('src'));
   script.setAttribute('id', 'jsonScript');
   script.setAttribute('type', 'text/javascript');
   document.documentElement.firstChild.appendChild(script);
@@ -199,7 +221,7 @@ Enter keyword <input type="text" id="searchbox" value="" /> <input type="submit"
 
  or select a topic <select id="topicdropdown" onchange="cm_getJSON(false)"></select>
 </form>
-<br/><br/>
+<br/>
 <input type="button" onclick="showPrevious()" value="Previous" id="previousBUTTON"/>
 <input type="button" onclick="showNext()" value="Next" id="nextBUTTON"/>
 <br/>
@@ -207,6 +229,6 @@ Enter keyword <input type="text" id="searchbox" value="" /> <input type="submit"
 <br/>
 <input type="button" onclick="showPrevious()" value="Previous" id="previousBUTTON2"/>
 <input type="button" onclick="showNext()" value="Next" id="nextBUTTON2"/>
-
+<p><img src="http://code.google.com/images/tearoff_icon.gif" style="border: 0;" alt="External"/> <em>Links with this icon go to an external site.</em></p>
 </body> </html>
 
