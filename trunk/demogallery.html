@@ -190,7 +190,7 @@ function cm_getJSON(preferSearch) {
     document.getElementById('searchbox').value = '';
     queryAndSort = '?reverse=true' +
                    '&orderby=column:topic' + topic.toLowerCase() +
-                   '&sq=topic' + topic.toLowerCase() + '%21%3D0';
+                   '&sq=topic' + topic.toLowerCase() + escape('!=""');
   }
   
   try {
