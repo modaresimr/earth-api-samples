@@ -122,13 +122,24 @@ DDSimulator.prototype.initUI = function(opt_cb) {
  * @param {Function?} opt_cb Optional callback
  */
 DDSimulator.prototype.finishInitUI_ = function(kml, opt_cb) {
-  this.modelPlacemark = kml.getFeatures().getChildNodes().item(0);
+  if (!kml ||
+      !kml.getFeatures().getChildNodes().getLength()) {
+    throw new Error('Error loading Model KML. Expected Document > Placemark > Model.');
+  }
+  
+  this.modelPlacemark = kml.getFeatures().getFirstChild();
+  if (!('getGeometry' in this.modelPlacemark) ||
+      this.modelPlacemark.getGeometry().getType() != 'KmlModel') {
+    throw new Error('Error loading Model KML. Expected Document > Placemark > Model.');
+  }
+  
   this.model = this.modelPlacemark.getGeometry();
   this.model.setAltitudeMode(this.ge.ALTITUDE_RELATIVE_TO_GROUND);
   
   this.ge.getFeatures().appendChild(this.modelPlacemark);
   
-  this.drive_(this.path[0].loc, this.path[1].loc);
+  this.drive_(this.path[0].loc,
+      this.geHelpers_.getHeading(this.path[0].loc, this.path[1].loc));
   
   var me = this;
   this.tickListener = function() {
@@ -182,14 +193,13 @@ DDSimulator.prototype.stop = function() {
  * location
  * @private
  * @param {google.maps.LatLng} loc Location to move the car to
- * @param {google.maps.LatLng} locFacing Direction the car should be facing
+ * @param {number} heading The direction the car should be facing
  */
-DDSimulator.prototype.drive_ = function(loc, locFacing) {
+DDSimulator.prototype.drive_ = function(loc, heading) {
   this.model.getLocation().setLatLngAlt(loc.lat(), loc.lng(), 0);
   
-  this.model.getOrientation().setHeading(
-      this.geHelpers_.getHeading(loc, locFacing));
-  this.moveToPointDriving_(loc, locFacing);
+  this.model.getOrientation().setHeading(heading);
+  this.moveToPointDriving_(loc, heading);
 }
 
 /**
@@ -211,13 +221,13 @@ DDSimulator.prototype.getTurnToDirection_ = function(heading1, heading2) {
  * locFacing and zoom to an appropriate level for the current speed
  * @private
  * @param {google.maps.LatLng} loc Move to location
- * @param {google.maps.LatLng} locFacing Location to face
+ * @param {number} heading Direction to face
  */
-DDSimulator.prototype.moveToPointDriving_ = function(loc, locFacing) {
+DDSimulator.prototype.moveToPointDriving_ = function(loc, heading) {
   var oldLa = this.ge.getView().copyAsLookAt(
       this.ge.ALTITUDE_RELATIVE_TO_GROUND);
   var curHeading = oldLa.getHeading();
-  var desiredHeading = this.geHelpers_.getHeading(loc, locFacing);
+  var desiredHeading = heading;
   
   var curRange = oldLa.getRange();
   var desiredRange = Math.max(20.0, this.currentSpeed * 10);
@@ -226,7 +236,7 @@ DDSimulator.prototype.moveToPointDriving_ = function(loc, locFacing) {
   la.set(loc.lat(), loc.lng(),
       0, // altitude
       this.ge.ALTITUDE_RELATIVE_TO_GROUND,
-      curHeading + 1.0 * this.getTurnToDirection_(curHeading, desiredHeading),
+      curHeading + this.getTurnToDirection_(curHeading, desiredHeading),
       60, // tilt
       curRange + (desiredRange - curRange) * 0.1 // range (inverse of zoom)
       );
@@ -257,21 +267,12 @@ DDSimulator.prototype.tick_ = function() {
   
   var segmentDuration = this.path[this.pathIndex_].duration;
   
-  if (segmentDuration) {
-    this.segmentDistance_ = this.path[this.pathIndex_].distance *
-                            Math.min(1.0, this.segmentTime_ / segmentDuration);
-    this.currentSpeed = this.path[this.pathIndex_].distance / segmentDuration;
-  } else {
-    this.segmentDistance_ = 0.0;
-    this.currentSpeed = 0.0;
-  }
-  
   if (!this.beforeSegmentDistance_)
     this.beforeSegmentDistance_ = 0.0;
   
   // move to next segment if we pass it in this tick
   while (this.pathIndex_ < this.path.length - 1 &&
-    this.segmentTime_ > segmentDuration) {
+    this.segmentTime_ >= segmentDuration) {
     this.segmentTime_ -= segmentDuration;
     
     // adjust distances
@@ -280,6 +281,19 @@ DDSimulator.prototype.tick_ = function() {
     
     // update new position in path array
     this.pathIndex_++;
+    
+    // bugfix thanks to naeeem, markw65:
+    segmentDuration = this.path[this.pathIndex_].duration;
+  }
+  
+  // bugfix thanks to markw65
+  if (segmentDuration) {
+    this.segmentDistance_ = this.path[this.pathIndex_].distance *
+                            Math.min(1.0, this.segmentTime_ / segmentDuration);
+    this.currentSpeed = this.path[this.pathIndex_].distance / segmentDuration;
+  } else {
+    this.segmentDistance_ = 0.0;
+    this.currentSpeed = 0.0;
   }
   
   this.totalDistance = this.beforeSegmentDistance_ + this.segmentDistance_;
@@ -294,7 +308,9 @@ DDSimulator.prototype.tick_ = function() {
       this.path[this.pathIndex_].loc,
       this.path[this.pathIndex_ + 1].loc,
       this.segmentTime_ / this.path[this.pathIndex_].duration);
-  this.drive_(this.currentLoc, this.path[this.pathIndex_ + 1].loc);
+  this.drive_(this.currentLoc,
+      this.geHelpers_.getHeading(this.path[this.pathIndex_].loc,
+                                 this.path[this.pathIndex_ + 1].loc));
   
   // fire the callback if one is provided
   if (this.options.on_tick)
