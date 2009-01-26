@@ -3,6 +3,24 @@ body {
   overflow: hidden;
 }
 
+.trlink {
+  float: right;
+  font-size: 14px;
+  background-color: #eaf0fa;
+  border: 2px solid #427bd6;
+  padding: 3px 6px;
+}
+
+.trlink a {
+  color: #1b488f;
+  font-weight: bold;
+}
+
+.trlink .new {
+  color: #c00;
+  font-weight: bold;
+}
+
 textarea {
   padding: 6px;
 }
