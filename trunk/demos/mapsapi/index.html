@@ -20,9 +20,10 @@ limitations under the License.
 -->
     <title>Using Google Earth with the Maps API</title>
     <!-- *** Replace the key below with your own API key, available at http://code.google.com/apis/maps/signup.html *** -->
-    <script type="text/javascript" src="http://maps.google.com/maps?file=api&v=2&key=ABQIAAAAwbkbZLyhsmTCWXbTcjbgbRSzHs7K5SvaUdm8ua-Xxy_-2dYwMxQMhnagaawTo7L1FE1-amhuQxIlXw"></script>
+    <script type="text/javascript" src="http://www.google.com/jsapi?key=ABQIAAAAwbkbZLyhsmTCWXbTcjbgbRSzHs7K5SvaUdm8ua-Xxy_-2dYwMxQMhnagaawTo7L1FE1-amhuQxIlXw"></script>
 
     <script type="text/javascript">
+    google.load('maps', '2');
     function initialize() {
       var map = new GMap2(document.getElementById("map"));
       map.setCenter(new GLatLng(37.4328, -122.077), 12);
