@@ -136,7 +136,8 @@ function initTableFeatures() {
                                  'updateIncreaseDecreaseGroundOverlay');
   appendTableRowIncreaseDecrease(feature, 'Altitude', 'altitude',
                                  'updateIncreaseDecreaseGroundOverlay');
-  appendTableRowAltitudeMode(feature, 'updateGroundOverlayAltitudeMode');
+  appendTableRowGroundOverlayAltitudeMode(feature,
+                                 'updateGroundOverlayAltitudeMode');
 
   // Set default choice
   updateFeature('placemark');

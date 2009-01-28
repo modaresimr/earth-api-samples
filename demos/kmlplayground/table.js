@@ -115,6 +115,17 @@ function appendTableRowAltitudeMode(divId, functionName) {
   setDefaultForTableRow(functionName, divId, 'altitudeMode', 'clampToGround');
 }
 
+function appendTableRowGroundOverlayAltitudeMode(divId, functionName) {
+  functionName = functionName || 'updateAltitudeMode';
+  var innerText = createTitleText('AltitudeMode') + '<br>' +
+    createItemText(divId, functionName, 'altitudeMode', 
+                   'clampToGround', 'ClampToGround') + '<br>' +
+    createItemText(divId, functionName, 'altitudeMode', 
+                   'absolute', 'Absolute');
+  appendTableRow(divId, innerText);
+  setDefaultForTableRow(functionName, divId, 'altitudeMode', 'clampToGround');
+}
+
 function appendTableRowAlignment(divId, title, alignType, functionName) {
   functionName = functionName || 'updateAligntment';
   var innerText = createTitleText(title) +

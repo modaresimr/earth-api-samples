@@ -63,6 +63,13 @@ function selectItemAltitudeMode(divId, type, value) {
   selectItem(divId, type, 'absolute', false);
   selectItem(divId, type, value, true);
 }
+
+function selectItemGroundOverlayAltitudeMode(divId, type, value) {
+  selectItem(divId, type, 'clampToGround', false);
+  selectItem(divId, type, 'absolute', false);
+  selectItem(divId, type, value, true);
+}
+
 function selectItemColor(divId, type, value) {
   selectItem(divId, type, 'red', false);  
   selectItem(divId, type, 'green', false);
