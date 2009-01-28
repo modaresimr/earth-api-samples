@@ -33,10 +33,9 @@ function updateGroundOverlayAltitudeMode(divId, type, value) {
   var obj = gFeatures[divId];
   var altitudeMode = {
     'clampToGround' : ge.ALTITUDE_CLAMP_TO_GROUND,
-    'relativeToGround' : ge.ALTITUDE_RELATIVE_TO_GROUND,
     'absolute' : ge.ALTITUDE_ABSOLUTE };
   obj.setAltitudeMode(altitudeMode[value]);
-  selectItemAltitudeMode(divId, type, value);
+  selectItemGroundOverlayAltitudeMode(divId, type, value);
 }
 
 function updateIncreaseDecreaseGroundOverlay(divId, type, value) {
