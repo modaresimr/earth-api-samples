@@ -77,8 +77,8 @@ function initStyleSelectors() {
 function initCamera() {
   ge.getOptions().setFlyToSpeed(1000);
   var la = ge.createLookAt('');
-  la.set(gLLA[0], gLLA[1], 99.99, ge.ALTITUDE_RELATIVE_TO_GROUND,
-         0, 70, gLLA[2]);
+  la.set(gLLA[0], gLLA[1], 50, ge.ALTITUDE_ABSOLUTE,
+         0, 45, gLLA[2]);
   ge.getView().setAbstractView(la);
 }
 
