@@ -1,0 +1,258 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+  <title>Earth API - KML DOM Tree</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <script type="text/javascript" src="http://www.google.com/jsapi?key=ABQIAAAAwbkbZLyhsmTCWXbTcjbgbRSzHs7K5SvaUdm8ua-Xxy_-2dYwMxQMhnagaawTo7L1FE1-amhuQxIlXw"></script>
+  <script type="text/javascript" src="ge-poly-fit-hack.js"></script>
+  <script type="text/javascript" src="kmldomwalk.js"></script>
+  <style type="text/css">
+    @import "http://ajax.googleapis.com/ajax/libs/dojo/1.2.3/dijit/themes/tundra/tundra.css";
+    @import "http://ajax.googleapis.com/ajax/libs/dojo/1.2.3/dojo/resources/dojo.css";
+  </style>
+  
+  <style type="text/css">@import "index.css";</style>
+<script type="text/javascript">
+// <![CDATA[
+
+djConfig = { parseOnLoad: true };
+google.load('dojo', '1.2.3');
+
+google.load('maps', '2.x');
+google.load('earth', '1.x');
+
+var g_ge;
+var g_earthDisabled = false;
+var g_kmlObject;
+
+google.setOnLoadCallback(function() {
+  dojo.require('dijit.layout.BorderContainer');
+  dojo.require('dijit.layout.SplitContainer');
+  dojo.require('dijit.layout.ContentPane');
+  dojo.require('dijit.Tree');
+  //dojo.require('dijit.CheckboxTree');
+  dojo.require("dijit.form.CheckBox");
+  dojo.require('dijit.form.Button');
+  dojo.require('dijit.form.TextBox');
+
+  dojo.require('dojo.data.ItemFileWriteStore');
+  
+  dojo.require('dojo.parser');
+  dojo.require('dojo.cookie');
+  dojo.require('dojo.fx');
+ 
+  dojo.addOnLoad(function() { 
+    // load checkboxtree
+    var scpt = document.createElement('script');
+    scpt.src = 'dijit.CheckboxTree.js';
+    document.body.appendChild(scpt);
+    
+    dijit.byId('load-button').setDisabled(true);
+    // build earth
+    google.earth.createInstance(
+      'map3d',
+      function(ge) {
+        g_ge = ge;
+        g_ge.getWindow().setVisibility(true);
+        g_ge.getNavigationControl().setVisibility(ge.VISIBILITY_AUTO);
+        g_ge.getLayerRoot().enableLayerById(g_ge.LAYER_BORDERS, true);
+        g_ge.getLayerRoot().enableLayerById(g_ge.LAYER_BUILDINGS, true);
+        
+        dijit.byId('load-button').setDisabled(false);
+      },
+      function() {
+        g_earthDisabled = true;
+        dijit.byId('load-button').setDisabled(true);
+      });
+  });
+});
+
+var g_treeIdObjectMap = null;
+
+function buildTreeUI(kmlObject) {
+  delete g_treeIdObjectMap;
+  g_treeIdObjectMap = {};
+  
+  var treeData = {
+    identifier: 'id',
+    label: 'name',
+    items: []
+  };
+  
+  // walk the loaded KML object DOM
+  walkKmlDom(kmlObject, function(context) {
+    // generate a random, unique ID for this node (Dojo requires a unique ID
+    // per each node)
+    var nodeId = Number(new Date()).toString() + Math.round(Math.random() * 99999).toString();
+    g_treeIdObjectMap[nodeId] = this;
+    
+    // create the tree node for this item
+    var treeNodeData = {
+      id: nodeId,
+      name: (this.getName() ? this.getName() : '<' + this.getType() + '>'),
+      type: this.getType(),
+      checked: this.getVisibility(),
+      children: []
+    };
+    
+    // add the tree node to the tree data hierarchy 
+    context.current.push(treeNodeData);
+    
+    // all actual KML child nodes will be added to this tree node's
+    // children list
+    context.child = treeNodeData.children;
+  }, { rootContext: treeData.items });
+  
+  if (dijit.byId('tree'))
+    dijit.byId('tree').destroy();
+  
+  // create the Dojo tree widget
+  // and set its data to the hierarchy we just
+  // built using walkKmlDom
+  var treeDiv = document.createElement('div');
+  treeDiv.style.height = '100%';
+  dojo.byId('left').appendChild(treeDiv);
+  
+  var store = new dojo.data.ItemFileWriteStore({ data: treeData });
+  
+  var model = new dijit.tree.CheckboxForestStoreModel({
+    store: store,
+    labelAttr: 'name',
+    typeAttr: 'type'
+  });
+  
+  var tree = new dijit.CheckboxTree({
+    id: 'tree',
+    model: model
+  }, treeDiv);
+  
+  // watch for changes in the 'checked' attribute and update feature visibility
+  // accordingly
+  dojo.connect(store, 'onSet', function(item, attribute, oldValue, newValue) {
+    if (oldValue != newValue &&
+        attribute == 'checked') {
+      var kmlObject = g_treeIdObjectMap[store.getValue(item, 'id')];
+      if (!kmlObject)
+        return;
+      
+      kmlObject.setVisibility(newValue);
+      
+      if (newValue == true) {
+        var c = kmlObject;
+        while (c && 'setVisibility' in c) {
+          c.setVisibility(newValue);
+          c = c.getParentNode();
+          //store.setValue(item, 'checked' 
+        }
+      }
+    }
+  });
+  
+  // when clicking a tree item, fly to it
+  dojo.connect(tree, 'onClick', function(item) {
+    if (item) {
+      var kmlObject = g_treeIdObjectMap[store.getValue(item, 'id')];
+      if (!kmlObject)
+        return;
+      
+      flyToFeature(kmlObject);
+    }
+  });
+  
+  var oldGetIconClass = tree.getIconClass;
+  tree.getIconClass = function(item, opened) {
+    var cls = '';
+    if (item) {
+      var kmlObject = g_treeIdObjectMap[store.getValue(item, 'id')];
+      if (kmlObject) {
+        if ('getGeometry' in kmlObject && kmlObject.getGeometry()) {
+          cls = kmlObject.getGeometry().getType();
+        } else {
+          cls = kmlObject.getType();
+        }
+      }
+    }
+    
+    return cls + ' ' + oldGetIconClass.apply(tree, [item, opened]);
+  };
+  
+  tree.getLabelClass = function(item, opened) {
+    if (item && tree.model.mayHaveChildren(item)) {
+      return 'folder';
+    }
+    
+    return '';
+  };
+  
+  expandTree();
+}
+
+function expandTree() {
+  var tree = dijit.byId('tree');
+  
+  function expandChildNode(node) {
+    dojo.forEach(node.getChildren(), function(c) { 
+      tree._expandNode(c);
+      expandChildNode(c);
+    }, this);
+  }
+  
+  expandChildNode(tree.rootNode);
+}
+
+function loadKml() {
+  var url = dijit.byId('kml-url').getValue();
+  
+  google.earth.fetchKml(g_ge, url, function(kmlObject) {
+    if (!kmlObject) {
+      // show error
+      alert('Error loading KML file');
+      return;
+    }
+    
+    if (g_kmlObject)
+      g_ge.getFeatures().removeChild(g_kmlObject);
+    
+    g_kmlObject = kmlObject;
+    g_ge.getFeatures().appendChild(g_kmlObject);
+    flyToFeature(g_kmlObject);
+    
+    buildTreeUI(g_kmlObject);
+  });
+}
+
+function flyToFeature(kmlFeature) {
+  var aspectRatio = dojo.coords('center').w * 1.0 / dojo.coords('center').h;
+  var lookAt = computeFitLookAt(g_ge, kmlFeature, aspectRatio);
+  if (lookAt)
+    g_ge.getView().setAbstractView(lookAt);
+}
+
+// ]]>
+</script>
+</head>
+<body class="tundra">
+  <div id="container" dojoType="dijit.layout.BorderContainer" gutters="false" region="center" style="height: 100%">
+  
+    <div id="top" dojoType="dijit.layout.ContentPane" region="top">
+      <h1 style="margin:0; padding:0">Earth API - KML DOM Tree</h1>
+      <input id="kml-url" dojoType="dijit.form.TextBox" value="http://code.google.com/apis/kml/documentation/KML_Samples.kml"/>
+      <button id="load-button" dojoType="dijit.form.Button" onclick="loadKml();">Load KML or KMZ</button>
+    </div>
+    
+    <div id="left" dojoType="dijit.layout.ContentPane" region="left"
+      splitter="true" minsize="200" style="width: 350px;">
+      
+    </div>
+  
+    <div id="center" dojoType="dijit.layout.ContentPane" region="center">
+      <div id="map3d" style="height: 100%"></div>
+    </div>
+    
+    <div id="bottom" dojoType="dijit.layout.ContentPane" region="bottom">
+    </div>
+  
+  </div>
+</body>
+</html>

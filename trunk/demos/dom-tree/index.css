@@ -1,0 +1,106 @@
+@charset "ISO-8859-1";
+
+@media screen {
+  html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: #eee;
+  }
+  
+  #center, #right {
+    border: 1px solid #888;
+  }
+
+  h1 {
+    font-weight: bold;
+  }
+  
+  #top {
+    padding: 10px;
+  }
+  
+  #bottom {
+    height: 10px;
+  }
+  
+  #left {
+    border: 1px solid #888;
+    background-color: #fff;
+    margin-left: 10px;
+  }
+  
+  #center {
+    margin-right: 10px;
+    background-color: #fff;
+  }
+  
+  #edit-toolbar {
+    position: relative;
+    z-index: 100;
+  }
+  
+  #kml-url {
+    font-size: 150%;
+    width: 50%;
+  }
+  
+  #load-button {
+    font-size: 150%;
+    font-weight: bold;
+  }
+  
+  #tree .dijitTreeLabel.folder {
+    font-weight: bold;
+  }
+
+  #tree .dijitTreeIcon.KmlPoint,
+  #tree .dijitTreeIcon.KmlPlacemark {
+    background: transparent url(images/KmlPoint.gif) no-repeat scroll top left;
+  }
+  
+  #tree .dijitTreeIcon.KmlScreenOverlay,
+  #tree .dijitTreeIcon.KmlGroundOverlay {
+    background: transparent url(images/KmlOverlay.gif) no-repeat scroll top left;
+  }
+  
+  #tree .dijitTreeIcon.KmlLineString,
+  #tree .dijitTreeIcon.KmlLinearRing {
+    background: transparent url(images/KmlLineString.gif) no-repeat scroll top left;
+  }
+  
+  #tree .dijitTreeIcon.KmlPolygon {
+    background: transparent url(images/KmlPolygon.gif) no-repeat scroll top left;
+  }
+  
+  #tree .dijitTreeIcon.KmlDocument {
+    background: transparent url(images/KmlDocument.gif) no-repeat scroll top left;
+  }
+  /*
+  #tree .dijitTreeIcon.dijitLeaf {
+    background: transparent url(images/kml16.gif) no-repeat scroll top left;
+  }
+
+  #tree .dijitTreeLabel {
+    font-weight: bold;
+  }
+
+  #tree .dijitTreeLabel.leaf-label {
+    font-weight: normal !important;
+    cursor: pointer;
+    color: #0000aa;
+    text-decoration: underline;
+  }
+  */
+  
+  #container .dijitSplitterV {
+    width: 10px;
+    background: transparent none;
+  }
+  
+  #container .dijitSplitterThumb {
+    width: 10px;
+    background-position: center center;
+  }
+}
