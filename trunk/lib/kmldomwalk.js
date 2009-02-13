@@ -1,7 +1,29 @@
+// kmldomwalk.js
+/*
+Copyright 2008 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 /**
  * Walks a KML object, calling a given visit function for each object in
  * the KML DOM. The lone argument must be either a visit function or an
  * options literal.
+ *
+ * NOTE: walking the DOM can have pretty poor performance on very large
+ * hierarchies, as first time accesses to KML objects from JavaScript
+ * incur some overhead in the API.
+ *
  * @param {KmlObject} rootObject The root of the KML object hierarchy to walk.
  * @param {Function} visitCallback The function to call upon visiting
  *     a node in the DOM. The 'this' variable in the callback function will be
