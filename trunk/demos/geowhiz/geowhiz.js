@@ -26,6 +26,7 @@ var maxrange = 4500000.0;
 var reticlelat = 2.0;
 var reticlelon = 2.0;
 var reticle;
+var find_timeout = null;
 
 // Clamps how far from the earth we will allow answers to be given. For
 // example, a player can cheat by being super far from the earth that their
@@ -42,7 +43,12 @@ function inRange(val, cmp, dt, range) {
 
 // Polling function to see if the destination has been found.
 window.findDestination = function(timeToFind, timedt) {
+  // Clear last timeout if it exists
+  if (find_timeout)
+    clearTimeout(find_timeout);
+
   window.onUpdateCallback(timeToFind);
+  window.updateReticle(); // Force update because the reticle lags
   if (timeToFind < 0)
     window.onTimeExpired(); // Callback
   else {
@@ -55,11 +61,12 @@ window.findDestination = function(timeToFind, timedt) {
     // the user is supposed to find.
     if (inRange(lat, window.findLat, latdt, range) &&
         inRange(lon, window.findLon, londt, range)) { 
-      window.updateReticle(); // Force update because the reticle lags
       window.onFound(); // Callback
     } else { // Continue polling
-      setTimeout('window.findDestination('+(timeToFind-timedt)+','+timedt+')', 
-                 timedt);
+      find_timeout =
+          setTimeout('window.findDestination(' +
+                    (timeToFind - timedt) + ','+timedt+')',
+                    timedt);
     }
   }
 }
@@ -72,8 +79,11 @@ window.find = function(destination, timeToFind) {
       window.findLon = point.x;
     }
   });
+
   // Begin polling
-  setTimeout('window.findDestination('+timeToFind+','+timedt+')', timedt * 4);
+  find_timeout =
+      setTimeout('window.findDestination('+timeToFind+','+timedt+')',
+                 timedt * 4);
 
 }
 
@@ -100,9 +110,7 @@ window.updateReticle = function() {
   coords.setLatLngAlt(0, lat - sizelat, lon - sizelon, 0); 
   coords.setLatLngAlt(1, lat - sizelat, lon + sizelon, 0); 
   coords.setLatLngAlt(2, lat + sizelat, lon + sizelon, 0); 
-  coords.setLatLngAlt(3, lat + sizelat, lon - sizelon, 0); 
-
-  setTimeout('window.updateReticle()', 16);
+  coords.setLatLngAlt(3, lat + sizelat, lon - sizelon, 0);
 }
 
 // Create the reticle object
