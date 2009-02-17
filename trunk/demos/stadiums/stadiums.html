@@ -27,16 +27,12 @@
   function initCB(instance) {
       ge = instance;
     ge.getWindow().setVisibility(true);
-    kmzs = ['http://sketchup.google.com/3dwarehouse/download?mid=6151c8c840ebdecfc37544baf5685388&rtyp=k2&fn=FedEx_Forum&ctyp=other&prevstart=0&ts=1202486526000','http://sketchup.google.com/3dwarehouse/download?mid=1933f060194b3cd9c7fa50fe5624075&rtyp=k2&fn=AT_TPark&ctyp=other&prevstart=0&ts=1202485416000','http://sketchup.google.com/3dwarehouse/download?mid=7aba8ef7a6384e213f4b71814119481e&rtyp=k2&fn=Superdome&ctyp=other&prevstart=0&ts=1202486919000','http://sketchup.google.com/3dwarehouse/download?mid=d0a60e59dd298c82109a355e8e5ea0c3&rtyp=k2&fn=Madison+Square+Garden&ctyp=other&prevstart=0&ts=1202488336000','http://sketchup.google.com/3dwarehouse/download?mid=8c4c2c716879dc31bab90bd41207498c&rtyp=k2&fn=Untitled&ctyp=other&prevstart=0&ts=1205276384000','http://sketchup.google.com/3dwarehouse/download?mid=ac7025ba5f4b91a41cc7117eeb26f175&rtyp=k2&fn=Yankee+Stadium&ctyp=other&prevstart=0&ts=1202487745000'];
-    nls=[];
+  
     frameendEL = false;
     buildings = false;
-    for (var i=0; i < kmzs.length;i++){
-      loadKmz(kmzs[i]);
-    }
-
+  
    
-
+    toggleBuildings();
     ge.getNavigationControl().setVisibility(ge.VISIBILITY_AUTO);
     
     ge.getLayerRoot().enableLayerById(ge.LAYER_BORDERS, true);
@@ -56,7 +52,7 @@
   if (!buildings)
   {
   buildings = true;
-  toggleVisibilityNLs(false);
+  //toggleVisibilityNLs(false);
   ge.getLayerRoot().enableLayerById(ge.LAYER_BUILDINGS, buildings);
 
   }
@@ -110,7 +106,9 @@ return networkLink;
     longitude = lng;
     heading = head;
     la.set(lat,lng,0,ge.ALTITUDE_RELATIVE_TO_GROUND,heading,tilt,range);
+    if (!frameendEL){
     toggleFrameendEL();
+    }
     ge.getOptions().setFlyToSpeed(.25);
     ge.getView().setAbstractView(la);
     turning = false;
