@@ -3,7 +3,11 @@
 
 function finished(object) {
   if (!object) {
-    alert('bad or NULL kml');
+    // wrap alerts in API callbacks and event handlers
+    // in a setTimeout to prevent deadlock in some browsers
+    setTimeout(function() {
+      alert('Bad or null KML.');
+    }, 0);
     return;
   }
   ge.getFeatures().appendChild(object);
