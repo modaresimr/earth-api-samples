@@ -19,8 +19,8 @@
 djConfig = { parseOnLoad: true };
 google.load('dojo', '1.2.3');
 
-google.load('maps', '2.x');
-google.load('earth', '1.x');
+google.load('maps', '2');
+google.load('earth', '1');
 
 var g_ge;
 var g_earthDisabled = false;
@@ -207,7 +207,9 @@ function loadKml() {
   google.earth.fetchKml(g_ge, url, function(kmlObject) {
     if (!kmlObject) {
       // show error
-      alert('Error loading KML file');
+      setTimeout(function() {
+        alert('Error loading KML.');
+      }, 0);
       return;
     }
     
