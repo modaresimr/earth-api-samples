@@ -184,6 +184,10 @@ function getPositiveMsg() {
 
 // Traverses the list the list of questions
 function lookForNewLocation(found) {
+  // mini-hack around alert/mouse event issue
+  ge.getOptions().setMouseNavigationEnabled(false);
+  ge.getOptions().setMouseNavigationEnabled(true);
+
   // Are there any questions left?
   if (currentIndex < geographyList.length) { 
     // Update the score and move onto the next question.
