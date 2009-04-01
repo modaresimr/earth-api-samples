@@ -112,8 +112,7 @@
 <li><a href="http://code.google.com/apis/earth/documentation/reference/interface_kml_line_style.html">KmlLineStyle Reference</a></li>
 <li><a href="http://code.google.com/apis/earth/documentation/reference/interface_kml_color.html">KmlColor Reference</a></li>
       </ul>
-      <h2>Relevant Code Excerpt:</h2>
-      <pre class="prettyprint lang-js">// If lineStringPlacemark doesn't already have a Style associated
+      <h2>Relevant Code Excerpt:</h2>      <pre class="prettyprint lang-js">// If lineStringPlacemark doesn't already have a Style associated
 // with it, we create it now.
 if (!lineStringPlacemark.getStyleSelector()) {
   lineStringPlacemark.setStyleSelector(ge.createStyle(''));
@@ -124,8 +123,7 @@ if (!lineStringPlacemark.getStyleSelector()) {
 // to change the color and width of the line.
 var lineStyle = lineStringPlacemark.getStyleSelector().getLineStyle();
 lineStyle.setWidth(lineStyle.getWidth() + 2);
-lineStyle.getColor().set('6600ffff');  // aabbggrr format</pre>
-    </div>
+lineStyle.getColor().set('6600ffff');  // aabbggrr format</pre>    </div>
   </div>
 </body>
 </html>

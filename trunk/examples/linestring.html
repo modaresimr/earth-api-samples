@@ -107,8 +107,7 @@
 <li><a href="http://code.google.com/apis/earth/documentation/reference/interface_kml_coord_array.html">KmlCoordArray Reference</a></li>
 <li><a href="http://code.google.com/apis/earth/documentation/reference/interface_kml_placemark.html">KmlPlacemark Reference</a></li>
       </ul>
-      <h2>Relevant Code Excerpt:</h2>
-      <pre class="prettyprint lang-js">function addToLineString(lineString, lat, lng, latOffset, lngOffset) {
+      <h2>Relevant Code Excerpt:</h2>      <pre class="prettyprint lang-js">function addToLineString(lineString, lat, lng, latOffset, lngOffset) {
   var altitude = 1.0; // give it some altitude
   lineString.getCoordinates().
     pushLatLngAlt(lat + latOffset, lng + lngOffset, altitude);
@@ -140,8 +139,7 @@ addToLineString(lineString, lat, lng, 1.5, 3.5, 0);
 addToLineString(lineString, lat, lng,   0, 4.0, 0);
 addToLineString(lineString, lat, lng, 1.5, 4.5, 0);
 
-ge.getFeatures().appendChild(lineStringPlacemark);</pre>
-    </div>
+ge.getFeatures().appendChild(lineStringPlacemark);</pre>    </div>
   </div>
 </body>
 </html>

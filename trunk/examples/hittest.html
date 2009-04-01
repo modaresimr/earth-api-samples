@@ -1,0 +1,187 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+  <title>Google Earth API Samples - Hit-Testing (X/Y to Lat/Lon)</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <style type="text/css">@import "static/examples.css";</style>
+  <style type="text/css">@import "static/prettify/prettify.css";</style>
+  <script type="text/javascript" src="static/prettify/prettify.js"></script>
+  <script type="text/javascript" src="http://www.google.com/jsapi?hl=en&amp;key=ABQIAAAAwbkbZLyhsmTCWXbTcjbgbRSzHs7K5SvaUdm8ua-Xxy_-2dYwMxQMhnagaawTo7L1FE1-amhuQxIlXw"></script>
+  <script type="text/javascript">
+  /* <![CDATA[ */
+  var ge;
+  var globePlacemark = null;
+  var terrainPlacemark = null;
+  var buildingsPlacemark = null;
+  
+  google.load("earth", "1");
+
+  function init() {
+    google.earth.createInstance('map3d', initCB, failureCB);
+  }
+  
+  function initCB(instance) {
+    ge = instance;
+    ge.getWindow().setVisibility(true);
+
+    
+    // add a navigation control
+    ge.getNavigationControl().setVisibility(ge.VISIBILITY_AUTO);
+    
+    // add some layers
+    ge.getLayerRoot().enableLayerById(ge.LAYER_BORDERS, true);
+    ge.getLayerRoot().enableLayerById(ge.LAYER_ROADS, true);
+
+    var la = ge.createLookAt('');
+    la.set(37.8018, -122.4060, 0, ge.ALTITUDE_RELATIVE_TO_GROUND, 15, 53, 227);
+    ge.getView().setAbstractView(la);
+    
+    
+    ge.getLayerRoot().enableLayerById(ge.LAYER_TERRAIN, true);
+    ge.getLayerRoot().enableLayerById(ge.LAYER_BUILDINGS, true);
+    
+    google.earth.addEventListener(ge.getGlobe(), 'click', function(evt) {
+      if (evt.getButton() != 0)
+        return;
+      
+      // remove old placemarks
+      if (globePlacemark)
+        ge.getFeatures().removeChild(globePlacemark);  
+      if (terrainPlacemark)
+        ge.getFeatures().removeChild(terrainPlacemark);
+      if (buildingsPlacemark)
+        ge.getFeatures().removeChild(buildingsPlacemark);
+      
+      // hit test and create new placemarks
+      var hitTestResult = ge.getView().hitTest(evt.getClientX(), ge.UNITS_PIXELS, evt.getClientY(), ge.UNITS_PIXELS, ge.HIT_TEST_GLOBE);
+      if (hitTestResult) {
+        globePlacemark = makePlacemark(hitTestResult.getLatitude(), hitTestResult.getLongitude(),
+            hitTestResult.getAltitude(), ge.ALTITUDE_ABSOLUTE, 'G');
+        ge.getFeatures().appendChild(globePlacemark);
+      }
+      
+      hitTestResult = ge.getView().hitTest(evt.getClientX(), ge.UNITS_PIXELS, evt.getClientY(), ge.UNITS_PIXELS, ge.HIT_TEST_TERRAIN);
+      if (hitTestResult) {
+        terrainPlacemark = makePlacemark(hitTestResult.getLatitude(), hitTestResult.getLongitude(),
+            hitTestResult.getAltitude(), ge.ALTITUDE_ABSOLUTE, 'T');
+        ge.getFeatures().appendChild(terrainPlacemark);
+      }
+      
+      hitTestResult = ge.getView().hitTest(evt.getClientX(), ge.UNITS_PIXELS, evt.getClientY(), ge.UNITS_PIXELS, ge.HIT_TEST_BUILDINGS);
+      if (hitTestResult) {
+        buildingsPlacemark = makePlacemark(hitTestResult.getLatitude(), hitTestResult.getLongitude(),
+            hitTestResult.getAltitude(), ge.ALTITUDE_ABSOLUTE, 'B');
+        ge.getFeatures().appendChild(buildingsPlacemark);
+      }
+    });
+    
+    
+    document.getElementById('installed-plugin-version').innerHTML =
+      ge.getPluginVersion().toString();
+  }
+  
+  function failureCB(errorCode) {
+  }
+  
+  
+  function makePlacemark(lat, lng, alt, altMode, iconStr) {  
+    var icon = ge.createIcon('');
+    icon.setHref('http://maps.google.com/mapfiles/kml/paddle/' + iconStr + '.png');
+    
+    var style = ge.createStyle('');
+    style.getIconStyle().setIcon(icon);
+    style.getIconStyle().getHotSpot().set(0.5, ge.UNITS_FRACTION, 0, ge.UNITS_FRACTION);
+    
+    var pt = ge.createPoint('');
+    pt.set(lat, lng, alt, altMode, false, false);
+    
+    var pm = ge.createPlacemark('');
+    pm.setGeometry(pt);
+    pm.setStyleSelector(style);
+    
+    return pm;
+  }
+  
+  
+  /* ]]> */
+  </script>
+</head>
+<body onload="if(window.prettyPrint)prettyPrint();init();">
+  <h1>Google Earth API Samples - Hit-Testing (X/Y to Lat/Lon)</h1>
+  <dl>
+            <dt>Last Modified:</dt><dd>01/30/2009</dd>
+    <dt>Installed Plugin Version:</dt><dd id="installed-plugin-version">...</dd>
+  </dl>
+  <div style="clear: both;"></div>
+  
+  <div id="ui" style="position: relative;">
+    <div id="map3d_container" style="border: 1px solid #000; width: 500px; height: 500px;">
+      <div id="map3d" style="height: 100%;"></div>
+    </div>
+  
+    <div id="extra-ui" style="position: absolute; left: 520px; top: 0;">
+      <h2>Relevant Resources:</h2>
+      <ul>
+<li><a href="http://code.google.com/apis/earth/documentation/reference/interface_g_e_view.html">GEView Reference</a></li>
+<li><a href="http://code.google.com/apis/earth/documentation/reference/google_earth_namespace.html">google.earth Namespace Reference</a></li>
+<li><a href="http://code.google.com/apis/earth/documentation/reference/interface_kml_event.html">KmlEvent Reference</a></li>
+      </ul>
+      <h2>Relevant Code Excerpt:</h2>      <pre class="prettyprint lang-js">var globePlacemark = null;
+var terrainPlacemark = null;
+var buildingsPlacemark = null;</pre>      <pre class="prettyprint lang-js">ge.getLayerRoot().enableLayerById(ge.LAYER_TERRAIN, true);
+ge.getLayerRoot().enableLayerById(ge.LAYER_BUILDINGS, true);
+
+google.earth.addEventListener(ge.getGlobe(), 'click', function(evt) {
+  if (evt.getButton() != 0)
+    return;
+  
+  // remove old placemarks
+  if (globePlacemark)
+    ge.getFeatures().removeChild(globePlacemark);  
+  if (terrainPlacemark)
+    ge.getFeatures().removeChild(terrainPlacemark);
+  if (buildingsPlacemark)
+    ge.getFeatures().removeChild(buildingsPlacemark);
+  
+  // hit test and create new placemarks
+  var hitTestResult = ge.getView().hitTest(evt.getClientX(), ge.UNITS_PIXELS, evt.getClientY(), ge.UNITS_PIXELS, ge.HIT_TEST_GLOBE);
+  if (hitTestResult) {
+    globePlacemark = makePlacemark(hitTestResult.getLatitude(), hitTestResult.getLongitude(),
+        hitTestResult.getAltitude(), ge.ALTITUDE_ABSOLUTE, 'G');
+    ge.getFeatures().appendChild(globePlacemark);
+  }
+  
+  hitTestResult = ge.getView().hitTest(evt.getClientX(), ge.UNITS_PIXELS, evt.getClientY(), ge.UNITS_PIXELS, ge.HIT_TEST_TERRAIN);
+  if (hitTestResult) {
+    terrainPlacemark = makePlacemark(hitTestResult.getLatitude(), hitTestResult.getLongitude(),
+        hitTestResult.getAltitude(), ge.ALTITUDE_ABSOLUTE, 'T');
+    ge.getFeatures().appendChild(terrainPlacemark);
+  }
+  
+  hitTestResult = ge.getView().hitTest(evt.getClientX(), ge.UNITS_PIXELS, evt.getClientY(), ge.UNITS_PIXELS, ge.HIT_TEST_BUILDINGS);
+  if (hitTestResult) {
+    buildingsPlacemark = makePlacemark(hitTestResult.getLatitude(), hitTestResult.getLongitude(),
+        hitTestResult.getAltitude(), ge.ALTITUDE_ABSOLUTE, 'B');
+    ge.getFeatures().appendChild(buildingsPlacemark);
+  }
+});</pre>      <pre class="prettyprint lang-js">function makePlacemark(lat, lng, alt, altMode, iconStr) {  
+  var icon = ge.createIcon('');
+  icon.setHref('http://maps.google.com/mapfiles/kml/paddle/' + iconStr + '.png');
+  
+  var style = ge.createStyle('');
+  style.getIconStyle().setIcon(icon);
+  style.getIconStyle().getHotSpot().set(0.5, ge.UNITS_FRACTION, 0, ge.UNITS_FRACTION);
+  
+  var pt = ge.createPoint('');
+  pt.set(lat, lng, alt, altMode, false, false);
+  
+  var pm = ge.createPlacemark('');
+  pm.setGeometry(pt);
+  pm.setStyleSelector(style);
+  
+  return pm;
+}</pre>    </div>
+  </div>
+</body>
+</html>

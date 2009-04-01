@@ -65,6 +65,7 @@ function Truck() {
   me.fastTimer = 0;
   me.popupTimer = 0;
 
+  ge.getOptions().setMouseNavigationEnabled(false);
   ge.getOptions().setFlyToSpeed(100);  // don't filter camera motion
 
   window.google.earth.fetchKml(ge, MODEL_URL,
@@ -103,7 +104,7 @@ Truck.prototype.finishInit = function(kml) {
   me.shadow.setVisibility(false);
   me.shadow.setIcon(ge.createIcon(''));
   me.shadow.setLatLonBox(ge.createLatLonBox(''));
-  me.shadow.setAltitudeMode(ge.ALTITUDE_CLAMP_TO_GROUND);
+  me.shadow.setAltitudeMode(ge.ALTITUDE_CLAMP_TO_SEA_FLOOR);
   me.shadow.getIcon().setHref(pagePath + 'shadowrect.png');
   me.shadow.setVisibility(true);
   ge.getFeatures().appendChild(me.shadow);
@@ -493,7 +494,7 @@ Truck.prototype.cameraCut = function() {
   var la = ge.createLookAt('');
   la.set(lo.getLatitude(), lo.getLongitude(),
          10 /* altitude */,
-         ge.ALTITUDE_RELATIVE_TO_GROUND,
+         ge.ALTITUDE_RELATIVE_TO_SEA_FLOOR,
          fixAngle(180 + me.model.getOrientation().getHeading() + 45),
          80, /* tilt */
          50 /* range */         
@@ -507,7 +508,7 @@ Truck.prototype.cameraFollow = function(dt, truckPos, localToGlobalFrame) {
   var c0 = Math.exp(-dt / 0.5);
   var c1 = 1 - c0;
 
-  var la = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
+  var la = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_SEA_FLOOR);
 
   var truckHeading = me.model.getOrientation().getHeading();
   var camHeading = la.getHeading();
@@ -530,7 +531,7 @@ Truck.prototype.cameraFollow = function(dt, truckPos, localToGlobalFrame) {
   var camLon = camLla[1];
   var camAlt = camLla[2] - ge.getGlobe().getGroundAltitude(camLat, camLon);
 
-  la.set(camLat, camLon, camAlt, ge.ALTITUDE_RELATIVE_TO_GROUND, 
+  la.set(camLat, camLon, camAlt, ge.ALTITUDE_RELATIVE_TO_SEA_FLOOR, 
         heading, 80 /*tilt*/, 0 /*range*/);
   ge.getView().setAbstractView(la);
 };

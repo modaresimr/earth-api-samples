@@ -50,10 +50,10 @@
     screenOverlay.getOverlayXY().setY(.5);
   
     // Set screen position in fractions.
-    screenOverlay.getOverlayXY().setXUnits(ge.UNITS_FRACTION);
-    screenOverlay.getOverlayXY().setYUnits(ge.UNITS_FRACTION);
-    screenOverlay.getOverlayXY().setX(Math.random());  // Random x.
-    screenOverlay.getOverlayXY().setY(Math.random());  // Random y.
+    screenOverlay.getScreenXY().setXUnits(ge.UNITS_FRACTION);
+    screenOverlay.getScreenXY().setYUnits(ge.UNITS_FRACTION);
+    screenOverlay.getScreenXY().setX(Math.random());  // Random x.
+    screenOverlay.getScreenXY().setY(Math.random());  // Random y.
   
     // Rotate around object's center point.
     screenOverlay.getRotationXY().setXUnits(ge.UNITS_FRACTION);
@@ -79,7 +79,7 @@
 <body onload="if(window.prettyPrint)prettyPrint();init();">
   <h1>Google Earth API Samples - Screen Overlay</h1>
   <dl>
-            <dt>Last Modified:</dt><dd>10/23/2008</dd>
+            <dt>Last Modified:</dt><dd>03/30/2009</dd>
     <dt>Installed Plugin Version:</dt><dd id="installed-plugin-version">...</dd>
   </dl>
   <div style="clear: both;"></div>
@@ -97,8 +97,7 @@
 <li><a href="http://code.google.com/apis/earth/documentation/reference/interface_kml_screen_overlay.html">KmlScreenOverlay Reference</a></li>
 <li><a href="http://code.google.com/apis/earth/documentation/reference/interface_kml_icon.html">KmlIcon Reference</a></li>
       </ul>
-      <h2>Relevant Code Excerpt:</h2>
-      <pre class="prettyprint lang-js">var screenOverlay = ge.createScreenOverlay('');
+      <h2>Relevant Code Excerpt:</h2>      <pre class="prettyprint lang-js">var screenOverlay = ge.createScreenOverlay('');
 screenOverlay.setIcon(ge.createIcon(''));
 screenOverlay.getIcon().
   setHref(&quot;http://www.google.com/intl/en_ALL/images/logo.gif&quot;);
@@ -111,10 +110,10 @@ screenOverlay.getOverlayXY().setX(.5);
 screenOverlay.getOverlayXY().setY(.5);
 
 // Set screen position in fractions.
-screenOverlay.getOverlayXY().setXUnits(ge.UNITS_FRACTION);
-screenOverlay.getOverlayXY().setYUnits(ge.UNITS_FRACTION);
-screenOverlay.getOverlayXY().setX(Math.random());  // Random x.
-screenOverlay.getOverlayXY().setY(Math.random());  // Random y.
+screenOverlay.getScreenXY().setXUnits(ge.UNITS_FRACTION);
+screenOverlay.getScreenXY().setYUnits(ge.UNITS_FRACTION);
+screenOverlay.getScreenXY().setX(Math.random());  // Random x.
+screenOverlay.getScreenXY().setY(Math.random());  // Random y.
 
 // Rotate around object's center point.
 screenOverlay.getRotationXY().setXUnits(ge.UNITS_FRACTION);
@@ -131,8 +130,7 @@ screenOverlay.getSize().setY(90);
 // Rotate by a random number of degrees.
 screenOverlay.setRotation(Math.random() * 360);
 
-ge.getFeatures().appendChild(screenOverlay);</pre>
-    </div>
+ge.getFeatures().appendChild(screenOverlay);</pre>    </div>
   </div>
 </body>
 </html>

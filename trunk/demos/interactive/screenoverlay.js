@@ -14,10 +14,10 @@ screenOverlay.getOverlayXY().setX(0.5);
 screenOverlay.getOverlayXY().setY(0.5);
 
 // Set screen position in fractions.
-screenOverlay.getOverlayXY().setXUnits(ge.UNITS_FRACTION);
-screenOverlay.getOverlayXY().setYUnits(ge.UNITS_FRACTION);
-screenOverlay.getOverlayXY().setX(Math.random());  // Random x.
-screenOverlay.getOverlayXY().setY(Math.random());  // Random y.
+screenOverlay.getScreenXY().setXUnits(ge.UNITS_FRACTION);
+screenOverlay.getScreenXY().setYUnits(ge.UNITS_FRACTION);
+screenOverlay.getScreenXY().setX(Math.random());  // Random x.
+screenOverlay.getScreenXY().setY(Math.random());  // Random y.
 
 // Rotate around object's center point.
 screenOverlay.getRotationXY().setXUnits(ge.UNITS_FRACTION);

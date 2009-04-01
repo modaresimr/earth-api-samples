@@ -125,9 +125,8 @@
 <li><a href="http://code.google.com/apis/earth/documentation/reference/interface_g_e_plugin.html">GEPlugin Reference</a></li>
 <li><a href="http://www.movable-type.co.uk/scripts/latlong.html">Geo Math Functions (movable-type.co.uk)</a></li>
       </ul>
-      <h2>Relevant Code Excerpt:</h2>
-      <pre class="prettyprint lang-js">var animRunning = false;
-var ANIM_ALTITUDE = 100;</pre><pre class="prettyprint lang-js">function startAnimation() {
+      <h2>Relevant Code Excerpt:</h2>      <pre class="prettyprint lang-js">var animRunning = false;
+var ANIM_ALTITUDE = 100;</pre>      <pre class="prettyprint lang-js">function startAnimation() {
   if (!animRunning) {
     ge.getOptions().setFlyToSpeed(ge.SPEED_TELEPORT);
     animRunning = true;
@@ -181,8 +180,7 @@ function destination(lat, lng, dist, heading) {
       180 / Math.PI *
         (lng + Math.atan2(Math.sin(heading) * Math.sin(dist) * Math.cos(lat2),
                           Math.cos(dist) - Math.sin(lat) * Math.sin(lat2)))];
-}</pre>
-    </div>
+}</pre>    </div>
   </div>
 </body>
 </html>
