@@ -102,8 +102,7 @@
 <li><a href="http://code.google.com/apis/earth/documentation/reference/interface_kml_coord_array.html">KmlCoordArray Reference</a></li>
 <li><a href="http://code.google.com/apis/earth/documentation/reference/interface_kml_placemark.html">KmlPlacemark Reference</a></li>
       </ul>
-      <h2>Relevant Code Excerpt:</h2>
-      <pre class="prettyprint lang-js">var polygonPlacemark = ge.createPlacemark('');
+      <h2>Relevant Code Excerpt:</h2>      <pre class="prettyprint lang-js">var polygonPlacemark = ge.createPlacemark('');
 var polygon = ge.createPolygon('');
 polygonPlacemark.setGeometry(polygon);
 var outer = ge.createLinearRing('');
@@ -129,8 +128,7 @@ coords.pushLatLngAlt(lat - .02, lon + .02, 0);
 coords.pushLatLngAlt(lat + .02, lon + .02, 0); 
 coords.pushLatLngAlt(lat + .02, lon - .02, 0); 
 
-ge.getFeatures().appendChild(polygonPlacemark);</pre>
-    </div>
+ge.getFeatures().appendChild(polygonPlacemark);</pre>    </div>
   </div>
 </body>
 </html>

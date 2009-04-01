@@ -21,6 +21,7 @@ limitations under the License.
   <!-- *** Replace the key below below with your own API key, available at http://code.google.com/apis/maps/signup.html *** -->
   <script src="http://www.google.com/jsapi?key=ABQIAAAAwbkbZLyhsmTCWXbTcjbgbRSzHs7K5SvaUdm8ua-Xxy_-2dYwMxQMhnagaawTo7L1FE1-amhuQxIlXw"></script>
   <script type="text/javascript" src="../../lib/math3d.js"></script>
+  <script type="text/javascript" src="../../lib/keyboard-focus-hack.js"></script>
   <script type="text/javascript" src="firstpersoncam.js"></script>
   <script type="text/javascript">
 google.load("earth", "1");
@@ -42,6 +43,8 @@ function initCB(object) {
   cam = new FirstPersonCam();
   cam.updateCamera();
   ge.getWindow().setVisibility(true);
+
+  keyboardFocusHack(ge);
 }
 
 function failureCB(object) {

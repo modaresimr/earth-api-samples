@@ -168,6 +168,9 @@ function FirstPersonCam() {
   // Used for bounce.
   me.distanceTraveled = 0;              
 
+  // prevent mouse navigation in the plugin
+  ge.getOptions().setMouseNavigationEnabled(false);
+
   // Updates should be called on frameend to help keep objects in sync.
   // GE does not propogate changes caused by KML objects until an
   // end of frame.
@@ -235,6 +238,7 @@ FirstPersonCam.prototype.updatePosition = function(dt) {
   } else if (altitudeDown) {
     cameraAltitude -= 1.0;
   }
+  cameraAltitude = Math.max(0, cameraAltitude);
   
   me.distanceTraveled += forward;
 
@@ -266,7 +270,7 @@ FirstPersonCam.prototype.updateCamera = function() {
   var la = ge.createLookAt('');
   la.set(me.localAnchorLla[0], me.localAnchorLla[1],
          cameraAltitude + bounce,
-         ge.ALTITUDE_RELATIVE_TO_GROUND,
+         ge.ALTITUDE_RELATIVE_TO_SEA_FLOOR,
          fixAngle(me.headingAngle * 180 / Math.PI), /* heading */         
          me.tiltAngle * 180 / Math.PI + 90, /* tilt */         
          0 /* altitude is constant */         

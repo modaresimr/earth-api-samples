@@ -96,8 +96,7 @@
 <li><a href="http://code.google.com/apis/earth/documentation/reference/interface_kml_coord_array.html">KmlCoordArray Reference</a></li>
 <li><a href="http://code.google.com/apis/earth/documentation/reference/interface_kml_placemark.html">KmlPlacemark Reference</a></li>
       </ul>
-      <h2>Relevant Code Excerpt:</h2>
-      <pre class="prettyprint lang-js">function makeCircle(radius, x, y) {
+      <h2>Relevant Code Excerpt:</h2>      <pre class="prettyprint lang-js">function makeCircle(radius, x, y) {
   var center = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
 
   var ring = ge.createLinearRing('');
@@ -115,8 +114,7 @@ var polygonPlacemark = ge.createPlacemark('');
 polygonPlacemark.setGeometry(ge.createPolygon(''));
 var outer = ge.createLinearRing('');
 polygonPlacemark.getGeometry().setOuterBoundary(makeCircle(.05, 0, 0));
-ge.getFeatures().appendChild(polygonPlacemark);</pre>
-    </div>
+ge.getFeatures().appendChild(polygonPlacemark);</pre>    </div>
   </div>
 </body>
 </html>

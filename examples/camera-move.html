@@ -67,12 +67,10 @@
 <li><a href="http://code.google.com/apis/earth/documentation/reference/interface_kml_look_at.html">KmlLookAt Reference</a></li>
 <li><a href="http://code.google.com/apis/earth/documentation/reference/interface_g_e_view.html">GEView Reference</a></li>
       </ul>
-      <h2>Relevant Code Excerpt:</h2>
-      <pre class="prettyprint lang-js">var lookAt = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
+      <h2>Relevant Code Excerpt:</h2>      <pre class="prettyprint lang-js">var lookAt = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
 lookAt.setLatitude(lookAt.getLatitude() + 2);
 lookAt.setLongitude(lookAt.getLongitude() + 20);
-ge.getView().setAbstractView(lookAt);</pre>
-    </div>
+ge.getView().setAbstractView(lookAt);</pre>    </div>
   </div>
 </body>
 </html>

@@ -76,8 +76,7 @@ google.load("maps", "2.xx");
 <li><a href="http://code.google.com/apis/maps/documentation/reference.html#GClientGeocoder">GClientGeocoder API Reference</a></li>
 <li><a href="http://code.google.com/apis/earth/documentation/reference/interface_kml_look_at.html">KmlLookAt Reference</a></li>
       </ul>
-      <h2>Relevant Code Excerpt:</h2>
-      <pre class="prettyprint lang-js">var geocodeLocation = document.getElementById('location').value;
+      <h2>Relevant Code Excerpt:</h2>      <pre class="prettyprint lang-js">var geocodeLocation = document.getElementById('location').value;
 
 var geocoder = new google.maps.ClientGeocoder();
 geocoder.getLatLng(geocodeLocation, function(point) {
@@ -87,8 +86,7 @@ geocoder.getLatLng(geocodeLocation, function(point) {
                0, 60, 20000);
     ge.getView().setAbstractView(lookAt);
   }
-});</pre>
-    </div>
+});</pre>    </div>
   </div>
 </body>
 </html>

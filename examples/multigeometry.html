@@ -96,8 +96,7 @@
 <li><a href="http://code.google.com/apis/earth/documentation/reference/interface_kml_multi_geometry.html">KmlMultiGeometry Reference</a></li>
 <li><a href="http://code.google.com/apis/earth/documentation/reference/interface_kml_placemark.html">KmlPlacemark Reference</a></li>
       </ul>
-      <h2>Relevant Code Excerpt:</h2>
-      <pre class="prettyprint lang-js">function makeCircle(radius, x, y) {
+      <h2>Relevant Code Excerpt:</h2>      <pre class="prettyprint lang-js">function makeCircle(radius, x, y) {
   var center = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
   var ring = ge.createLinearRing('');
   var steps = 25;
@@ -117,8 +116,7 @@ geoms.appendChild(makeCircle(.25, 0, 0));
 geoms.appendChild(makeCircle(.55, 0, 0));
 geoms.appendChild(makeCircle(.85, 0, 0));
 geoms.appendChild(makeCircle(1.15, 0, 0));
-ge.getFeatures().appendChild(multGeoPlacemark);</pre>
-    </div>
+ge.getFeatures().appendChild(multGeoPlacemark);</pre>    </div>
   </div>
 </body>
 </html>
