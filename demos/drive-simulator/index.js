@@ -118,12 +118,12 @@ function DS_directionsLoaded() {
     
     DS_placemarks['step-' + i] = placemark; 
     
-    google.earth.addEventListener(placemark, 'click', function() {
+    google.earth.addEventListener(placemark, 'click', function(event) {
       // match up the placemark to its id in the dictionary to find out
       // which step number it is
       var id = '';
       for (k in DS_placemarks)
-        if (DS_placemarks[k] == this)
+        if (DS_placemarks[k].equals(event.getTarget()))
           id = k;
       
       var stepNum = parseInt(id.match(/step-(\d+)/)[1]);
@@ -284,7 +284,7 @@ function DS_buildDirectionsList() {
 
 /**
  * Fly the camera to the given step index in the route, and highlight it in
- * the directions list
+ * the directions list. Also show the placemark description balloon.
  * @param {number} stepNum The 0-based step index to fly to
  */
 function DS_flyToStep(stepNum) {
@@ -299,7 +299,12 @@ function DS_flyToStep(stepNum) {
       50 // range (inverse of zoom)
       );
   DS_ge.getView().setAbstractView(la);
-  
+
+  // show the description balloon.
+  var balloon = DS_ge.createFeatureBalloon('');
+  balloon.setFeature(DS_placemarks['step-' + stepNum]);
+  DS_ge.setBalloon(balloon); 
+
   DS_highlightStep(stepNum);
 }
 
