@@ -27,9 +27,6 @@
     // add a navigation control
     ge.getNavigationControl().setVisibility(ge.VISIBILITY_AUTO);
     
-    // add some layers
-    ge.getLayerRoot().enableLayerById(ge.LAYER_BORDERS, true);
-    ge.getLayerRoot().enableLayerById(ge.LAYER_ROADS, true);
 
     document.getElementById('installed-plugin-version').innerHTML =
       ge.getPluginVersion().toString();
@@ -44,7 +41,7 @@
 <body onload="if(window.prettyPrint)prettyPrint();init();">
   <h1>Google Earth API Samples - Mars/Alternate Server Connectivity</h1>
   <dl>
-            <dt>Last Modified:</dt><dd>03/16/2009</dd>
+            <dt>Last Modified:</dt><dd>04/02/2009</dd>
     <dt>Installed Plugin Version:</dt><dd id="installed-plugin-version">...</dd>
   </dl>
   <div style="clear: both;"></div>
