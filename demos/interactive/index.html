@@ -319,7 +319,7 @@ function resize() {
         </div>
       </td>
       <td valign=top>
-        <form action='javascript:globalEval(unescapeXml(el("sample_code").value));return false;'>
+        <form onsubmit='globalEval(unescapeXml(el("sample_code").value));void(0);'>
           <input type='submit' value='Run code'></input><br>
           <textarea name=sample_code id=sample_code cols=80 rows=20/></textarea>
         </form>
