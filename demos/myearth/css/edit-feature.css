@@ -1,0 +1,143 @@
+/*
+Copyright 2009 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/* basics */
+
+#edit-feature-box {
+  width: 300px;
+  height: 224px;
+}
+
+#feature-detail-button {
+  float: right;
+  display: block;
+  z-index: 500;
+  width: 32px;
+  height: 32px;
+  padding: 2px;
+  cursor: pointer;
+  border: 2px solid #00f;
+}
+
+.infowindow-form input[type=text],
+.infowindow-form textarea,
+.infowindow-form .color-picker {
+  border: 1px solid #888;
+  padding: 3px;
+}
+
+.infowindow-form #feature-title {
+  margin-left: 30px;
+}
+
+.infowindow-form #feature-description {
+  display: block;
+  width: 250px;
+  height: 130px;
+}
+
+.infowindow-form .field {
+  padding-bottom: 10px;
+}
+
+.infowindow-form .field label {
+  font-weight: bold;
+  color: #888;
+}
+
+.infowindow-form .button-row input[type=button],
+#feature-basics-button {
+  float: right;
+}
+
+/* markers */
+#marker-icons {
+  width: 290px;
+  height: 190px;
+  overflow-y: scroll;
+}
+
+#marker-icons .marker-icon {
+  display: block;
+  float: left;
+  width: 32px;
+  height: 32px;
+  border: 2px solid #fff;
+  background-image: url(../images/iconm.png);
+}
+
+#marker-icons .marker-icon:hover,
+#marker-icons .marker-icon.selected {
+  border: 2px solid #00a;
+}
+
+/* line and poly */
+#feature-detail .infowindow-form {
+  padding-top: 30px;
+}
+
+#feature-detail .field {
+  position: relative;
+}
+
+#line-color,
+#line-width,
+#line-opacity,
+#fill-color,
+#fill-opacity {
+  position: absolute;
+  left: 140px;
+  top: 0;
+  width: 30px;
+}
+
+.infowindow-form .color-picker {
+  cursor: pointer;
+  height: 1em;
+}
+
+.infowindow-form .color-picker span {
+  display: none;
+}
+
+.color-picker-box {
+  border:1px solid #ccc;
+  z-index: 1000;
+  position: absolute;
+}
+
+.color-picker-box, .color-picker-box iframe {
+  width: 126px;
+  height: 180px;
+}
+
+.color-picker-box iframe {
+  position: absolute;
+  z-index: -1;
+  left: 0;
+  top: 0;
+}
+
+.color-picker-box .color-item {
+  display: block;
+  float: left;
+  width: 16px;
+  height: 16px;
+  border: 1px solid silver;
+}
+
+.color-picker-box .color-item:hover {
+  border: 1px solid #fff;
+}
