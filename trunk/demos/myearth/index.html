@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+  Copyright 2009 Google Inc.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<head>
+  <title>My Earth</title>
+  
+  <!-- jQuery and micro templates library by John Resig -->
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js"></script>
+  <script src="http://www.google.com/jsapi?key=ABQIAAAAwbkbZLyhsmTCWXbTcjbgbRSzHs7K5SvaUdm8ua-Xxy_-2dYwMxQMhnagaawTo7L1FE1-amhuQxIlXw"></script>
+  <script src="lib/jquery.pngFix.pack.js"></script>
+  <script src="lib/microtemplate.js"></script>
+  <script src="lib/xmlutil.js"></script>
+  
+  <!-- Earth API stuff -->
+  <script src="http://earth-api-samples.googlecode.com/svn/trunk/lib/ge-poly-fit-hack.js"></script>
+  <script src="http://earth-api-utility-library.googlecode.com/svn/trunk/extensions/dist/extensions.pack.js"></script>
+  
+  <!-- App JS -->
+  <script src="js/index.js"></script>
+  
+  <style>
+    @import "http://ajax.googleapis.com/ajax/libs/yui/2.7.0/build/reset/reset-min.css";
+    @import "css/edit-feature.css";
+    @import "css/index.css";
+  </style>
+  <script>
+  
+  google.load('maps', '2'); // for ge-poly-fit-hack (GLatLngBounds)
+  google.load('earth', '1');
+  google.load('gdata', '1.x', { packages: ['maps'] });
+
+  google.setOnLoadCallback(init);
+  $(function(){ $(document).pngFix(); });
+
+  </script>
+</head>
+<body>
+  <div id="container">
+    <div class="section" id="top">
+      <div id="user-panel">
+        <div class="needsauth">
+          You are logged in  |  <a href="#" onclick="logout(); return false;">Logout</a>
+        </div>
+        <div class="guestonly">
+          <a href="#" onclick="login(); return false;">Login</a>
+        </div>
+      </div>
+      <img id="logo" src="images/earthicon.png"/>
+      <h1>My Earth</h1>
+      <h2>3D My Maps client powered by the <a href="http://code.google.com/apis/earth">Google Earth API</a> and
+        <a href="http://code.google.com/apis/maps/documentation/mapsdata/">Google Maps Data API</a></h2>
+    </div>
+    
+    <div class="section" id="middle">
+      <div class="guestonly" id="not-logged-in-text">
+        To begin using My Earth, <a href="#" onclick="login(); return false;">login</a> to your Google Account.
+      </div>
+      
+      <div class="needsauth" id="left-panel">
+        <img src="images/loading.gif" id="loading-image" />
+        
+        <select id="map-list" disabled="disabled">
+          <option value="">-- Select a map --</option>
+        </select>
+        
+        <div id="edit-buttons"></div>
+        
+        <div id="map-detail">
+          <div id="error-message"></div>
+          <ul id="feature-list"></ul>
+        </div>
+      </div>
+      
+      <div class="needsauth" id="map3d_container">
+        <div id="map3d"></div>
+      </div>
+      
+      <div style="clear: both;"></div>
+    </div>
+    
+    <div class="section" id="bottom">
+      This is a sample. &copy; 2009, Google
+    </div>
+
+  </div>
+  
+
+  <img src="images/pixel.gif" />
+  
+  <!-- micro templates -->
+  <script id="template-edit-feature" type="text/html">
+    <div id="edit-feature-box">
+      <div id="feature-detail-container" style="display: none">
+        <div id="feature-detail"></div>
+        <input type="button" id="feature-basics-button" value="OK"/>
+      </div>
+      <div id="feature-basics">
+        <a href="#" id="feature-detail-button"></a>
+        <form class="infowindow-form" onsubmit="return false;">
+          <div class="field">
+            <label for="feature-title">Title</label>
+            <input id="feature-title" type="text" maxlength="250"/>
+          </div>
+          <div class="field">
+            <label for="feature-description">Description</label>
+            <textarea id="feature-description" cols="50" rows="4"></textarea>
+          </div>
+          <div class="button-row">
+            <input type="button" id="feature-close-button" value="Close"/>
+            <a id="feature-delete" href="#">Delete</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </script>
+  
+  <script id="template-edit-marker-detail" type="text/html">
+    <div>
+      <div id="marker-icons"></div>
+    </div>
+  </script>
+  
+  <script id="template-edit-linepoly-detail" type="text/html">
+    <div>
+      <form class="infowindow-form" onsubmit="return false;">
+        <div class="field">
+          <label for="line-color">Line color</label>
+          <div id="line-color" class="color-picker"><span></span></div>
+        </div>
+        <div class="field">
+          <label for="line-width">Line width (pixels)</label>
+          <input id="line-width" type="text"/>
+        </div>
+        <div class="field">
+          <label for="line-opacity">Line opacity</label>
+          <input id="line-opacity" type="text"/>
+        </div>
+        <div class="field poly-only">
+          <label for="fill-color">Fill color</label>
+          <div id="fill-color" class="color-picker"><span></span></div>
+        </div>
+        <div class="field poly-only">
+          <label for="fill-opacity">Fill opacity</label>
+          <input id="fill-opacity" type="text"/>
+        </div>
+      </form>
+    </div>
+  </script>
+  
+  <script type="text/javascript">
+    var COLORS_PER_ROW = 7;
+    var COLOR_TABLE = [
+        "#ffffff","#cccccc","#c0c0c0","#999999","#666666","#333333","#000000",
+        "#ffcccc","#ff6666","#ff0000","#cc0000","#990000","#660000","#330000",
+        "#ffcc99","#ff9966","#ff9900","#ff6600","#cc6600","#993300","#663300",
+        "#ffff99","#ffff66","#ffcc66","#ffcc33","#cc9933","#996633","#663333",
+        "#ffffcc","#ffff33","#ffff00","#ffcc00","#999900","#666600","#333300",
+        "#99ff99","#66ff99","#33ff33","#33cc00","#009900","#006600","#003300",
+        "#99ffff","#33ffff","#66cccc","#00cccc","#339999","#336666","#003333",
+        "#ccffff","#66ffff","#33ccff","#3366ff","#3333ff","#000099","#000066",
+        "#ccccff","#9999ff","#6666cc","#6633ff","#6600cc","#333399","#330099",
+        "#ffccff","#ff99ff","#cc66cc","#cc33cc","#993399","#663366","#330033"];
+    
+    var MARKER_ICONS_PER_ROW = 7;
+    var MARKER_ICONS = [];
+    (function() {
+      var i, j;
+      var colors = ['blu','red','grn','ltblu','ylw','purple','pink'];
+      var styles = [
+        'http://maps.google.com/mapfiles/kml/paddle/%s-circle.png',
+        'http://maps.google.com/mapfiles/kml/paddle/%s-blank.png',
+        'http://maps.google.com/mapfiles/kml/pushpin/%s-pushpin.png'
+      ];
+
+      var iconHref;
+      for (i = 0; i < styles.length; i++)
+        for (j = 0; j < colors.length; j++) {
+          iconHref = styles[i].replace(/%s/, colors[j]);
+          if (iconHref == 'http://maps.google.com/mapfiles/kml/pushpin/blu-pushpin.png')
+            iconHref = 'http://maps.google.com/mapfiles/kml/pushpin/blue-pushpin.png';
+          MARKER_ICONS.push(iconHref);
+        }
+
+      var shapeTpl = 'http://maps.google.com/mapfiles/kml/shapes/%s.png';
+      var shapes = [
+        'dining','coffee','bars','snack_bar','tram','lodging','wheel_chair_accessible',
+        'shopping','movies','convenience','grocery','arts','homegardenbusiness','electronics',
+        'mechanic','partly_cloudy','realestate','salon','dollar','parking_lot','gas_stations',
+        'cabs','bus','truck','rail','airports','ferry','heliport',
+        'subway','info','flag','earthquake','webcam','post_office','police',
+        'firedept','hospitals','info_circle','phone','caution','falling_rocks','camera',
+        'parks','campfire','picnic','campground','ranger_station','toilets','poi',
+        'hiker','cycling','motorcycling','horsebackriding','play','golf','trail',
+        'water','snowflake_simple','marina','fishing','sailing','swimming','ski',
+        'woman','man','rainy','volcano','sunny','euro','yen'
+      ];
+
+      for (i = 0; i < shapes.length; i++)
+        MARKER_ICONS.push(shapeTpl.replace(/%s/, shapes[i]));
+    }());
+
+  </script>
+
+</body>
+</html>
