@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<!--
+Copyright 2009 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+    <title>Using Google Earth with the Maps API</title>
+    <!-- *** Replace the key below with your own API key, available at http://code.google.com/apis/maps/signup.html *** -->
+    <script type="text/javascript" src="http://www.google.com/jsapi?key=ABQIAAAAwbkbZLyhsmTCWXbTcjbgbRSzHs7K5SvaUdm8ua-Xxy_-2dYwMxQMhnagaawTo7L1FE1-amhuQxIlXw"></script>
+
+    <script type="text/javascript">
+    google.load('maps', '2.x');
+    var map;
+
+    function initialize() {
+      map = new GMap2(document.getElementById("map"));
+      map.setCenter(new GLatLng(37.4328, -122.077), 12);
+
+      // The following line makes the map Earth-enabled by adding the
+      // "Earth" button to the map type control.  Note that you still
+      // need to add a map type control (GMapTypeControl,
+      // GMenuMapTypeControl, or GHierarchicalMapTypeControl) to the
+      // the map (as is done below) for the "Earth" button and the rest
+      // of the map type buttons to show up at all.
+      // Also, be sure you are loading v=2.x of the Maps API and not
+      // v=2, otherwise the G_SATELLITE_3D_MAP map type will not
+      // work properly.
+      map.addMapType(G_SATELLITE_3D_MAP);
+
+      map.addControl(new GHierarchicalMapTypeControl());
+      map.addControl(new GLargeMapControl());
+      
+      var marker = new GMarker(new GLatLng(37.4228, -122.085));
+      GEvent.addListener(marker, "click", function() {
+        var html = '<div style="width: 210px; padding-right: 10px">Hello world!<\/div>';
+        marker.openInfoWindowHtml(html);
+      });
+      map.addOverlay(marker);
+      GEvent.trigger(marker, "click");
+
+      var polyline = new GPolyline([
+          new GLatLng(37.4419, -122.1419),
+          new GLatLng(37.4219, -122.1219),
+          new GLatLng(37.4319, -122.1119),
+          new GLatLng(37.4119, -122.0919)
+         ], "#ff0000", 10);
+      GEvent.addListener(polyline, "click", function(latlng) {
+        var html = '<div style="width: 210px; padding-right: 10px">A polyline.<\/div>';
+        map.openInfoWindowHtml(latlng, html);
+      });
+      map.addOverlay(polyline);
+    }
+    </script>
+  </head>
+  <body onload="initialize()" onunlaod="GUnload">
+    <div id="map" class="map" style="width:800px;height:600px"></div>
+  </body>
+</html>

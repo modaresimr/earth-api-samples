@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<!--
+Copyright 2009 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+    <title>Using Google Earth with the Maps API</title>
+    <!-- *** Replace the key below with your own API key, available at http://code.google.com/apis/maps/signup.html *** -->
+    <script type="text/javascript" src="http://www.google.com/jsapi?key=ABQIAAAAwbkbZLyhsmTCWXbTcjbgbRSzHs7K5SvaUdm8ua-Xxy_-2dYwMxQMhnagaawTo7L1FE1-amhuQxIlXw"></script>
+
+    <script type="text/javascript">
+    google.load('maps', '2.x');
+    var map;
+    var geoXml;
+    
+    function initialize() {
+      map = new GMap2(document.getElementById("map"));
+      map.setCenter(new GLatLng(37.4328, -122.077), 12);
+      map.addMapType(G_SATELLITE_3D_MAP);
+      var mapui = map.getDefaultUI();
+      mapui.maptypes.physical = false;
+      map.setUI(mapui);
+      map.setMapType(G_SATELLITE_MAP);
+    }
+    
+    function loadKml(url) {
+      map.clearOverlays();
+      geoXml = new GGeoXml(url);
+      map.addOverlay(geoXml);
+      geoXml.gotoDefaultViewport(map);
+      
+      document.getElementById('kmlurl').value = url;
+    }
+    
+    function loadKmlBox() {
+      loadKml(document.getElementById('kmlurl').value);
+    }
+    </script>
+  </head>
+  <body onload="initialize()" onunlaod="GUnload">
+        
+    <input id="kmlurl" size="100" value="http://code.google.com/articles/support/earthapikml.kml"/>
+    <input type="button" onclick="loadKmlBox()" value="Load KML"/>
+    
+    <br>
+    <br>
+    
+    <a href="#" onclick="loadKml('http://code.google.com/articles/support/earthapikml.kml'); return false;">Basic KML</a> |
+    <a href="#" onclick="loadKml('http://services.google.com/earth/kmz/vancouver_sea_levels_n.kmz'); return false;">Sample KML 1</a> |
+    <a href="#" onclick="loadKml('http://www.cornishlight.co.uk/cornishlight.kml'); return false;">Sample KML 2</a> <br>
+  
+    <br>
+    <br>
+    <div id="map" class="map" style="width:800px;height:600px"></div>
+  </body>
+</html>
