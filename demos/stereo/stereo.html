@@ -33,7 +33,7 @@ log = function(msg) {
   }
 }
 google.load("earth", "1");
-google.load("maps", "2.99");
+google.load("maps", "2");
 
 var ge1 = null;
 var ge2 = null;
@@ -51,7 +51,7 @@ function initCB1(object) {
   ge1 = object;
   ge1.getWindow().setVisibility(true);
   showVersions(ge1);
-  google.earth.addEventListener(ge1, "frameend", updateView1);
+  google.earth.addEventListener(ge1, "viewchange", updateView1);
   google.earth.addEventListener(ge1.getWindow(), "mousedown", function (e) { 
       masterge = 1;});
 }
@@ -63,7 +63,7 @@ function initCB2(object) {
     (elapsedStartupTime/1000) + 's';
   ge2 = object;
   ge2.getWindow().setVisibility(true);
-  google.earth.addEventListener(ge2, "frameend", updateView2);
+  google.earth.addEventListener(ge2, "viewchange", updateView2);
   google.earth.addEventListener(ge2.getWindow(), "mousedown", function (e) {
       masterge = 2;});
   setTimeout(function() { ready_for_updates = true; }, 3000);
