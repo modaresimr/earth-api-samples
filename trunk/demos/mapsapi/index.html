@@ -4,7 +4,7 @@
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <!--
-Copyright 2008 Google Inc.
+Copyright 2009 Google Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -24,8 +24,10 @@ limitations under the License.
 
     <script type="text/javascript">
     google.load('maps', '2');
+    var map;
+
     function initialize() {
-      var map = new GMap2(document.getElementById("map"));
+      map = new GMap2(document.getElementById("map"));
       map.setCenter(new GLatLng(37.4328, -122.077), 12);
 
       // The following line makes the map Earth-enabled by adding the
@@ -34,9 +36,6 @@ limitations under the License.
       // GMenuMapTypeControl, or GHierarchicalMapTypeControl) to the
       // the map (as is done below) for the "Earth" button and the rest
       // of the map type buttons to show up at all.
-      // Also, be sure you are loading v=2.x of the Maps API and not
-      // v=2, otherwise the G_SATELLITE_3D_MAP map type will not
-      // work properly.
       map.addMapType(G_SATELLITE_3D_MAP);
 
       map.addControl(new GHierarchicalMapTypeControl());
@@ -66,5 +65,9 @@ limitations under the License.
   </head>
   <body onload="initialize()" onunload="GUnload">
     <div id="map" class="map" style="width:800px;height:600px"></div>
+
+    <b><br><br><a href="beefy.html">A slightly more robust demo</a>
+    <br><br><a href="ggeoxml.html">GGeoXml + Earth</a></b>
+
   </body>
 </html>

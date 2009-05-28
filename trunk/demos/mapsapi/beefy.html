@@ -26,7 +26,7 @@ limitations under the License.
       html, body { background-color: black; }
     </style>
     <script type="text/javascript">
-    google.load('maps', '2.x');
+    google.load('maps', '2.160');
     var map;
     function initialize() {
       map = new GMap2(document.getElementById("map"));
@@ -38,9 +38,6 @@ limitations under the License.
       // GMenuMapTypeControl, or GHierarchicalMapTypeControl) to the
       // the map (as is done below) for the "Earth" button and the rest
       // of the map type buttons to show up at all.
-      // Also, be sure you are loading v=2.x of the Maps API and not
-      // v=2, otherwise the G_SATELLITE_3D_MAP map type will not
-      // work properly.
       map.addMapType(G_SATELLITE_3D_MAP);
       var mapui = map.getDefaultUI();
       mapui.maptypes.physical = false;
