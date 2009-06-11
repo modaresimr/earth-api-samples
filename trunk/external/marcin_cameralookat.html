@@ -15,7 +15,7 @@ function init() {
 function initCB(object) {
 	ge = object;
 	ge.getWindow().setVisibility(true);
-	google.earth.addEventListener(ge, "viewchange", eventListener);
+	google.earth.addEventListener(ge.getView(), "viewchange", eventListener);
 	ge.getNavigationControl().setVisibility(ge.VISIBILITY_SHOW);
 }
 
