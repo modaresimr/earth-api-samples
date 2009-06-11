@@ -58,4 +58,13 @@
     margin: 0;
     padding: 0;
   }
+  
+  #playground-button {
+    display: block;
+    padding-top: 8px;
+  }
+  
+  #playground-button img {
+    border: 0;
+  }
 }

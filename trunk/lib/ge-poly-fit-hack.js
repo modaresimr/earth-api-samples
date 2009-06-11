@@ -1,3 +1,19 @@
+/*
+Copyright 2009 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 function getObjectCoordData(ge, kmlObject) {
   var out = {
     'coords': [],
@@ -16,7 +32,8 @@ function getObjectCoordData(ge, kmlObject) {
   }
   
   function pushCoord(pointOrCoord) {
-    pushLatLngAlt(pointOrCoord.getLatitude(), pointOrCoord.getLongitude(), pointOrCoord.getAltitude());
+    pushLatLngAlt(pointOrCoord.getLatitude(), pointOrCoord.getLongitude(),
+                  pointOrCoord.getAltitude());
   }
   
   function pushChildCall(retval, altitudeMode) {
@@ -109,13 +126,15 @@ function computeFitLookAt(ge, obj, aspectRatio) {
     var center = null;
     var range = 0.0;
     if (coordData.coords.length == 1) {
-      center = new google.maps.LatLng(coordData.coords[0].lat, coordData.coords[0].lng);
+      center = new google.maps.LatLng(coordData.coords[0].lat,
+                                      coordData.coords[0].lng);
       range = 1000;
     } else {
       // compute bbox
       var bounds = new google.maps.LatLngBounds();
       for (var i = 0; i < coordData.coords.length; i++)
-        bounds.extend(new google.maps.LatLng(coordData.coords[i].lat, coordData.coords[i].lng));
+        bounds.extend(new google.maps.LatLng(coordData.coords[i].lat,
+                                             coordData.coords[i].lng));
       
       // find center
       center = bounds.getCenter();
@@ -134,7 +153,9 @@ function computeFitLookAt(ge, obj, aspectRatio) {
       var beta;
       
       var aspectUse = Math.max(aspectRatio, Math.min(1.0, lngSpan / latSpan));
-      var alpha = (45.0 / (aspectUse + 0.4) - 2.0) * DEGREES; // computed experimentally;
+      
+       // computed experimentally;
+      var alpha = (45.0 / (aspectUse + 0.4) - 2.0) * DEGREES;
       
       // create LookAt using distance formula
       if (lngSpan > latSpan) {
@@ -150,7 +171,8 @@ function computeFitLookAt(ge, obj, aspectRatio) {
     }
     
     var la = ge.createLookAt('');
-    la.set(center.lat(), center.lng(), coordData.maxAltitude, coordData.altitudeMode, 0, 0, range);
+    la.set(center.lat(), center.lng(), coordData.maxAltitude,
+           coordData.altitudeMode, 0, 0, range);
     return la;
   }
   

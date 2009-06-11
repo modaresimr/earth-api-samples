@@ -1,12 +1,30 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
-"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<!DOCTYPE html>
+<html>
+<!--
+Copyright 2009 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
 <head>
-  <title>Google Earth API Samples - YouTube Embed (HTML String) Balloons</title>
+  <title>Google Earth API Samples - Embedding YouTube Videos in Balloons</title>
   <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <!-- You should probably remove most of this extra cruft if you're copying
+       this sample! -->
   <style type="text/css">@import "static/examples.css";</style>
   <style type="text/css">@import "static/prettify/prettify.css";</style>
   <script type="text/javascript" src="static/prettify/prettify.js"></script>
+  
+  <!-- Change the key below to your own Maps API key -->
   <script type="text/javascript" src="http://www.google.com/jsapi?hl=en&amp;key=ABQIAAAAwbkbZLyhsmTCWXbTcjbgbRSzHs7K5SvaUdm8ua-Xxy_-2dYwMxQMhnagaawTo7L1FE1-amhuQxIlXw"></script>
   <script type="text/javascript">
   /* <![CDATA[ */
@@ -22,7 +40,6 @@
   function initCB(instance) {
     ge = instance;
     ge.getWindow().setVisibility(true);
-
     
     // add a navigation control
     ge.getNavigationControl().setVisibility(ge.VISIBILITY_AUTO);
@@ -85,9 +102,9 @@
   </script>
 </head>
 <body onload="if(window.prettyPrint)prettyPrint();init();">
-  <h1>Google Earth API Samples - YouTube Embed (HTML String) Balloons</h1>
+  <h1>Google Earth API Samples - Embedding YouTube Videos in Balloons</h1>
   <dl>
-            <dt>Last Modified:</dt><dd>10/30/2008</dd>
+            <dt>Last Modified:</dt><dd>06/08/2009</dd>
     <dt>Installed Plugin Version:</dt><dd id="installed-plugin-version">...</dd>
   </dl>
   <div style="clear: both;"></div>
@@ -102,7 +119,7 @@
       <ul>
 <li><a href="http://code.google.com/apis/earth/documentation/reference/interface_g_e_html_string_balloon.html">GEHtmlStringBalloon Reference</a></li>
 <li><a href="http://code.google.com/apis/earth/documentation/reference/interface_g_e_plugin.html">GEPlugin Reference</a></li>
-      </ul>
+<a id="playground-button" href="http://code.google.com/apis/ajax/playground/?exp=earth#embedding_youtube_videos_in_balloons"><img src="static/playground-button.png"/></a>      </ul>
       <h2>Relevant Code Excerpt:</h2>      <pre class="prettyprint lang-js">google.earth.addEventListener(placemark, 'click', function(event) {
   // prevent the default balloon from popping up
   event.preventDefault();
