@@ -61,6 +61,12 @@ limitations under the License.
       GEvent.addListener(marker2, "click", function() {
         alert('A custom event listener even!');
       });
+      GEvent.addListener(marker2, "mouseover", function() {
+        marker2.setImage('http://maps.google.com/mapfiles/dd-end.png');
+      });
+      GEvent.addListener(marker2, "mouseout", function() {
+        marker2.setImage('http://maps.google.com/mapfiles/dd-start.png');
+      });
       map.addOverlay(marker2);
 
       // create a polyline
@@ -108,9 +114,9 @@ limitations under the License.
 
       // create a screen overlay
       var screenoverlay = new GScreenOverlay('beefy.png',
-          new GScreenPoint(0, 0, 'fraction', 'fraction'),
-          new GScreenPoint(0, 0, 'fraction', 'fraction'),
-          new GScreenSize(1, 1, 'fraction', 'fraction'));
+          new GScreenPoint(610, 0),
+          new GScreenPoint(0, 0),
+          new GScreenSize(190, 165));
       map.addOverlay(screenoverlay);
     }
     </script>
