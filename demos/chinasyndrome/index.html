@@ -28,12 +28,21 @@ var geocoder;
 var laMaster, laSlave;
 var camMaster, camSlave;
 
+function fitLongitude(lon) {
+  while (lon < 0)
+    lon += 360;
+
+  lon = lon % 360;
+
+  return (lon > 180) ? lon - 360 : lon;
+}
+
 function el(e) { return document.getElementById(e); }
 function syncSlave() {
   if (geMaster && geSlave && laMaster && laSlave) {
     if (el("china").checked) {
       laMaster = geMaster.getView().copyAsLookAt(geMaster.ALTITUDE_RELATIVE_TO_GROUND);
-      laSlave.set(-laMaster.getLatitude(), laMaster.getLongitude() + 180,
+      laSlave.set(-laMaster.getLatitude(), fitLongitude(laMaster.getLongitude() + 180),
                   laMaster.getAltitude(), laMaster.getAltitudeMode(), 
                   laMaster.getHeading(), laMaster.getTilt(),
                   laMaster.getRange());
@@ -116,9 +125,9 @@ function submitLocation() {
       <td>&nbsp;</td>
       <td>
         <form>
-          <input type="radio" id="china" name="slaveMode" checked>China Syndrome</input>
+          <input type="radio" id="china" name="slaveMode" onclick="syncSlave()" checked>China Syndrome</input>
           <br />
-          <input type="radio" id="eyes" name="slaveMode">Eyes in the back of your head</input>
+          <input type="radio" id="eyes" name="slaveMode" onclick="syncSlave()">Eyes in the back of your head</input>
         </form>
       </td>
     </tr>
