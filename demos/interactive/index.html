@@ -31,6 +31,8 @@ var windowHeight = -1;
 var outText = '';
 var BOTTOM_MARGIN = 32;
 var RIGHT_MARGIN = 32;
+var MIN_BOTTOM_HEIGHT = 200;
+var MAX_TOP_HEIGHT = 400;
 
 // Init 'counter' (which is used to create unique style IDs, for example)
 var counter = 1;
@@ -269,6 +271,9 @@ function resize() {
   windowWidth = width;
   windowHeight = height;
 
+  var topTable = document.getElementById('toptable');
+  topTable.style.height = Math.max(20, Math.min(MAX_TOP_HEIGHT, height - MIN_BOTTOM_HEIGHT)) + 'px';
+
   stretchToBottom(el('samples'));
   stretchToBottom(el('sample_code'));
   stretchToRight(el('sample_code'));
@@ -295,14 +300,14 @@ function resize() {
     </span>
   </div>
 
-  <table width='100%' cellspacing='6'>
+  <table width='100%' cellspacing='6' id='toptable'>
     <tr>
-      <td valign=top>
+      <td valign=top height='100%'>
         <div id='map3d_container'>
           <div id='map3d'></div>
         </div>
       </td>
-      <td width='280px' valign=top>
+      <td width='280px' valign=top height='100%'>
         <div id='log'>
         </div>
       </td>

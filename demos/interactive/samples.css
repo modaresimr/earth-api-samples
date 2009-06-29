@@ -32,10 +32,14 @@ form {
   width: 100%
 }
 
+#toptable {
+  height: 400px;
+}
+
 #log {
   border: 1px solid silver; 
   padding-left: 3px;
-  height: 400px;
+  height: 100%;
   overflow: auto; 
   background: white;
   font-size: 9pt;
@@ -60,7 +64,7 @@ form {
 #map3d_container {
   position: relative; 
   border: 1px solid silver; 
-  height: 400px; 
+  height: 100%;
   width: 100%;
 }
 
