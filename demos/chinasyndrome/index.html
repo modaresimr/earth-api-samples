@@ -62,7 +62,7 @@ function init() {
       geMaster.getOptions().setAtmosphereVisibility(true);
       laMaster = geMaster.createLookAt('');
       camMaster = geMaster.createCamera('');
-      object.getWindow().setVisibility(true);
+      geMaster.getWindow().setVisibility(true);
     },
     function(object) {});
   google.earth.createInstance(
@@ -76,8 +76,9 @@ function init() {
       geSlave.getOptions().setMouseNavigationEnabled(false);
       laSlave = geSlave.createLookAt('');
       camSlave = geSlave.createCamera('');
+      syncSlave();
       google.earth.addEventListener(geMaster.getView(), 'viewchange', syncSlave);
-      object.getWindow().setVisibility(true);
+      geSlave.getWindow().setVisibility(true);
     },
     /***
      * This function will be called if plugin fails to load, in case
