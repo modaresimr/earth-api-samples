@@ -73,9 +73,10 @@ function init() {
       geSlave.getLayerRoot().enableLayerById(geSlave.LAYER_BUILDINGS, true);
       geSlave.getOptions().setAtmosphereVisibility(true);
       geSlave.getOptions().setFlyToSpeed(geSlave.SPEED_TELEPORT);
+      geSlave.getOptions().setMouseNavigationEnabled(false);
       laSlave = geSlave.createLookAt('');
       camSlave = geSlave.createCamera('');
-      google.earth.addEventListener(geSlave.getView(), 'viewchange', syncSlave);
+      google.earth.addEventListener(geMaster.getView(), 'viewchange', syncSlave);
       object.getWindow().setVisibility(true);
     },
     /***
