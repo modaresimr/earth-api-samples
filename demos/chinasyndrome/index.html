@@ -62,6 +62,7 @@ function init() {
   geocoder = new google.maps.ClientGeocoder();
 
   // Create the earths
+  var syncActive = false;
   google.earth.createInstance(
     "geMaster",
     function(object) {
@@ -71,6 +72,11 @@ function init() {
       geMaster.getOptions().setAtmosphereVisibility(true);
       laMaster = geMaster.createLookAt('');
       camMaster = geMaster.createCamera('');
+      syncSlave();
+      if (!syncActive) {
+        google.earth.addEventListener(geMaster.getView(), 'viewchange', syncSlave);
+        syncActive = true;
+      }
       geMaster.getWindow().setVisibility(true);
     },
     function(object) {});
@@ -86,7 +92,10 @@ function init() {
       laSlave = geSlave.createLookAt('');
       camSlave = geSlave.createCamera('');
       syncSlave();
-      google.earth.addEventListener(geMaster.getView(), 'viewchange', syncSlave);
+      if (!syncActive && geMaster) {
+        google.earth.addEventListener(geMaster.getView(), 'viewchange', syncSlave);
+        syncActive = true;
+      }
       geSlave.getWindow().setVisibility(true);
     },
     /***
