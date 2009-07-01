@@ -1,0 +1,128 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN""http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<!--
+Copyright 2009 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+  <title>Google Earth Plugin - HTML5/Gears/IP Geolocation</title>
+  <!-- *** Replace the key below below with your own API key, available at http://code.google.com/apis/maps/signup.html *** -->
+  <script type="text/javascript" src="http://www.google.com/jsapi?key=ABQIAAAAwbkbZLyhsmTCWXbTcjbgbRSzHs7K5SvaUdm8ua-Xxy_-2dYwMxQMhnagaawTo7L1FE1-amhuQxIlXw"></script>
+  <script type="text/javascript" src="http://earth-api-utility-library.googlecode.com/svn/trunk/extensions/dist/extensions.pack.js"></script>
+  <script type="text/javascript" src="gears_init.js"></script>
+  <script type="text/javascript" src="bboxview.js"></script>
+  <script type="text/javascript" src="location.js"></script>
+  
+  <script type="text/javascript">
+google.load("earth", "1");
+
+var ge = null;
+var gex = null;
+
+function init() {
+  google.earth.createInstance("map3d", initCallback);
+}
+
+function initCallback(pluginInstance) {
+  ge = pluginInstance;
+  gex = new GEarthExtensions(ge);
+  
+  ge.getWindow().setVisibility(true);
+  
+  document.getElementById('status').innerHTML = 'Waiting for location...';
+  watchLocation(watchCallback, function(err) {
+    document.getElementById('status').style.color = 'red';
+    document.getElementById('status').innerHTML = err.message || 'Geolocation error';
+  });
+}
+
+function watchCallback(coords, locationProvider) {
+  gex.dom.clearFeatures();
+  document.getElementById('status').style.color = '';
+  document.getElementById('status').innerHTML =
+      'Geolocation found, provided by "<code><strong>' + locationProvider + '</strong></code>".';
+
+  var center = new geo.Point(coords.latitude, coords.longitude);
+
+  if (coords.accuracy) {
+    gex.dom.addPointPlacemark(center, {
+      style: {
+        icon: {
+          color: '#08f',
+          stockIcon: 'shapes/placemark_circle'
+        }
+      }
+    });
+    
+    // there is some measure of accuracy, in meters
+    var bounds = new geo.Bounds();
+    var pts = [];
+    for (var heading = 0; heading <= 360; heading += 10) {
+      var circlePt = center.destination({ heading: heading,
+                                          distance: coords.accuracy });
+      pts.push(circlePt);
+
+      if (heading % 90 == 0)
+        bounds.extend(circlePt);
+    }
+
+    gex.dom.addPolygonPlacemark(pts, {
+      style: {
+        poly: { opacity: 0.5, color: '#08f' },
+        line: { opacity: 1.0, color: '#08f', width: 5 }
+      }
+    });
+      
+    var pluginContainerNode = document.getElementById('map3d');
+    var boundsView = createBoundsView(ge, bounds,
+                                      pluginContainerNode.offsetWidth /
+                                        pluginContainerNode.offsetHeight);
+    if (boundsView)
+      ge.getView().setAbstractView(boundsView);
+  } else {
+    gex.dom.addPointPlacemark(center, {
+      name: 'IP-based location',
+      style: {
+        icon: {
+          opacity: 0.7,
+          color: '#f80',
+          stockIcon: 'shapes/placemark_circle'
+        }
+      }
+    });
+    
+    // we don't know accuracy
+    gex.util.lookAt(center, { range: 1000 });
+  }
+}
+
+google.setOnLoadCallback(init);
+  </script>
+</head>
+
+<body>
+  <div style="font-weight:bold; font-size: 16pt; font-family: arial; width: 640px">
+    <center>Google Earth Plugin - HTML5/Gears/IP Geolocation</center>
+  </div>
+  
+  <div id="status" style="width: 618px; border: 1px solid silver; padding: 10px; margin: 10px 0">
+    Status N/A
+  </div>
+  
+  <div id="map3d_container" style="border: 1px solid silver; height: 480px; width: 638px">
+    <div id="map3d" style="height: 100%;"></div>
+  </div>
+</body>
+</html>
