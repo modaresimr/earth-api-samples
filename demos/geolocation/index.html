@@ -40,6 +40,8 @@ function initCallback(pluginInstance) {
   gex = new GEarthExtensions(ge);
   
   ge.getWindow().setVisibility(true);
+  ge.getLayerRoot().enableLayerById(ge.LAYER_BORDERS, true);
+  ge.getLayerRoot().enableLayerById(ge.LAYER_ROADS, true);
   
   document.getElementById('status').innerHTML = 'Waiting for location...';
   watchLocation(watchCallback, function(err) {
@@ -56,15 +58,18 @@ function watchCallback(coords, locationProvider) {
 
   var center = new geo.Point(coords.latitude, coords.longitude);
 
+  var placemarkJson = {};
+
   if (coords.accuracy) {
-    gex.dom.addPointPlacemark(center, {
-      style: {
-        icon: {
-          color: '#08f',
-          stockIcon: 'shapes/placemark_circle'
-        }
+    placemarkJson.name = 'You are here';
+    placemarkJson.point = center;
+    placemarkJson.style = {
+      label: '#08f',
+      icon: {
+        color: '#08f',
+        stockIcon: 'shapes/placemark_circle'
       }
-    });
+    };
     
     // there is some measure of accuracy, in meters
     var bounds = new geo.Bounds();
@@ -78,12 +83,11 @@ function watchCallback(coords, locationProvider) {
         bounds.extend(circlePt);
     }
 
-    gex.dom.addPolygonPlacemark(pts, {
-      style: {
-        poly: { opacity: 0.5, color: '#08f' },
-        line: { opacity: 1.0, color: '#08f', width: 5 }
-      }
-    });
+    placemarkJson.polygon = pts;
+    placemarkJson.style.poly = { opacity: 0.5, color: '#08f' };
+    placemarkJson.style.line = { opacity: 1.0, color: '#08f', width: 5 };
+
+    gex.dom.addPlacemark(placemarkJson);
       
     var pluginContainerNode = document.getElementById('map3d');
     var boundsView = createBoundsView(ge, bounds,
@@ -93,8 +97,9 @@ function watchCallback(coords, locationProvider) {
       ge.getView().setAbstractView(boundsView);
   } else {
     gex.dom.addPointPlacemark(center, {
-      name: 'IP-based location',
+      name: 'Your IP is here',
       style: {
+        label: '#f80',
         icon: {
           opacity: 0.7,
           color: '#f80',
