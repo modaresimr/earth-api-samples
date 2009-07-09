@@ -38,8 +38,7 @@ google.load("earth", "1");
 
 var ge = null;
 
-var appPath = document.location.protocol + '//' +
-              document.location.host + document.location.pathname;
+var appPath = document.location.href.replace(/\/[^\/]*$/, '/');
 
 function init() {
   // NOTE: Transparent PNG's don't work in Internet Explorer 6
