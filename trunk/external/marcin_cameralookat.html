@@ -45,10 +45,8 @@ function eventListener(event) {
 </head>
 <body onload='init()' id='body'>
   
-<div id='map3d_container' style='height: 480px; width: 640px'>
-	<div id='map3d' style='height: 100%;'></div>
-</div>
-<div>
+<div id='map3d' style='height: 480px; width: 640px'></div>
+
 <table>
 	<tr>
 		<th>Camera</th>
@@ -62,7 +60,7 @@ function eventListener(event) {
 		<td id='id_lng_cam'></td>
 	</tr>
 	<tr>
-		<td>Altitude:<td>
+		<td>Altitude (relativeToGround):<td>
 		<td id='id_alt_cam'></td>
 	</tr>
 	<tr>
@@ -98,7 +96,7 @@ function eventListener(event) {
 		<td id='id_rng_la'></td>
 	</tr>
 	<tr>
-		<td>Altitude:<td>
+		<td>Altitude (relativeToGround):<td>
 		<td id='id_alt_la'></td>
 	</tr>
 	<tr>
@@ -110,6 +108,6 @@ function eventListener(event) {
 		<td id='id_tilt_la'></td>
 	</tr>
 </table>
-<div>
+
 </body>
 </html>

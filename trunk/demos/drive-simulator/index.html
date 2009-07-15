@@ -37,7 +37,7 @@ function DS_init() {
       
       DS_ge.getNavigationControl().setVisibility(ge.VISIBILITY_AUTO);
       
-      DS_map = new GMap2($('#map-container').get(0));
+      DS_map = new GMap2($('#map').get(0));
       DS_map.setCenter(new GLatLng(37.4419, -122.1419), 13);
       DS_map.addControl(new GSmallMapControl());
       DS_map.enableContinuousZoom();
@@ -50,7 +50,7 @@ function DS_init() {
   function onresize() {
     var clientHeight = document.documentElement.clientHeight;
 
-    $('#route-details, #earth-container, #map-container').each(function() {
+    $('#route-details, #earth, #map').each(function() {
       $(this).css({
         height: (clientHeight - $(this).position().top - 100).toString() + 'px' });      
     });
@@ -102,15 +102,11 @@ google.setOnLoadCallback(DS_init);
     <div id="route-details"></div>
   </td>
   <td style="width: 67%" valign="top">
-    <div id="earth-container" style="border: 1px solid #000; height: 500px;">
-      <div id="earth" style="height: 100%;"></div>
-    </div>
+    <div id="earth" style="border: 1px solid #000; height: 500px;">
     <div id="status"></div>
   </td>
   <td style="width: 33%" valign="top">
-    <div id="map-container" style="border: 1px solid #000; height: 500px;">
-    
-    </div>
+    <div id="map" style="border: 1px solid #000; height: 500px;"></div>
   </td>
 </tr>
 </table>

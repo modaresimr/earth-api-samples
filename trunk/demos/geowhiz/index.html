@@ -196,10 +196,10 @@ function lookForNewLocation(found) {
       document.getElementById('score').innerHTML = getScoreAsString();
       if (!found) {
         alert(getNegativeMsg() + " Now find: " + 
-              geographyList[currentIndex].str);		
+              geographyList[currentIndex].str);    
       } else
         alert(getPositiveMsg() + " Now find: " + 
-              geographyList[currentIndex].str);		
+              geographyList[currentIndex].str);    
     } else {
       alert("First, find: " + geographyList[currentIndex].str);
     }
@@ -218,17 +218,17 @@ function lookForNewLocation(found) {
     if (percent < 0.10) 
       alert("Game over: You need to study!");
     else if (percent < 0.25) 
-	  alert("Game over: You should take this quiz again!");
+    alert("Game over: You should take this quiz again!");
     else if (percent < 0.50) 
-	  alert("Game over: You're still not a Geo Whiz");
+    alert("Game over: You're still not a Geo Whiz");
     else if (percent < 0.65) 
-	  alert("Game over: You need to use Google Earth more!");
+    alert("Game over: You need to use Google Earth more!");
     else if (percent < 0.75) 
-	  alert("Game over: Getting closer to being a geo whiz!");
+    alert("Game over: Getting closer to being a geo whiz!");
     else if (percent == 1.0) 
-	  alert("You're a Geo Whiz! That's why you're in google!");
+    alert("You're a Geo Whiz! That's why you're in google!");
     else 
-	  alert("Game over: G E O...W H I...!"); // So close..
+    alert("Game over: G E O...W H I...!"); // So close..
   }
 }
 
@@ -242,32 +242,30 @@ function lookForNewLocation(found) {
     </div>
     
     <table>
-       <tr><td>
-	   <div id='map3d_container'>
-	     <div id='map3d'></div>
-	   </div>
-	 </td><td valign=top>
-	   <div id='resultstitle' class="subtitle">Results</div>
-	   <div id='results' class="resultsgroup"></div>
+      <tr><td>
+         <div id='map3d'></div>
+       </td><td valign=top>
+     <div id='resultstitle' class="subtitle">Results</div>
+     <div id='results' class="resultsgroup"></div>
        </td></tr>
     </table>
 
     <div id="outputgroup" class="title">
 
       <table>
-	<tr><td>
-	    <div id="findtitle" class="subtitle">FIND LOCATION</div>
-	    <div id="find" class="textgroup"></div>
-	  </td><td>
+  <tr><td>
+      <div id="findtitle" class="subtitle">FIND LOCATION</div>
+      <div id="find" class="textgroup"></div>
+    </td><td>
 
-	    <div id="timetitle" class="subtitle">TIME LEFT</div>
-	    <div id="time" class="textgroup"></div>
+      <div id="timetitle" class="subtitle">TIME LEFT</div>
+      <div id="time" class="textgroup"></div>
 
-	  </td><td>
+    </td><td>
 
-	    <div id="scoretitle" class="subtitle">SCORE</div>
-	    <div id="score" class="textgroup"></div>
-	</td></tr>
+      <div id="scoretitle" class="subtitle">SCORE</div>
+      <div id="score" class="textgroup"></div>
+  </td></tr>
       </table>
 
     </div>
