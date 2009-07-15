@@ -62,6 +62,7 @@ function initFeatures() {
 function initStyleSelectors() {
   // Create style
   gStyleSelector['style'] = ge.createStyle('');
+  gStyleSelector['style'].getIconStyle().setIcon(ge.createIcon(''));
 
   // Create stylemap
   var iconNormal = ge.createStyle('');
