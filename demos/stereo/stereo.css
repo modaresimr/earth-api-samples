@@ -38,17 +38,10 @@ form {
   float: right;
 }
 
-#map3d_container {
-  position: relative; 
+#map3d {
   border: 1px solid silver; 
   height: 400px; 
   width: 100%;
-}
-
-#map3d {  
-  height: 100%; 
-  width: 100%;
-  z-index: 10; 
 }
 
 #load_sample_label {  

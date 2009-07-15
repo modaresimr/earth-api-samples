@@ -37,17 +37,10 @@ A:visited {text-decoration: none; color: blue; }
 A:active {text-decoration: none}
 A:hover {text-decoration: underline; color: red;}  
 
-#map3d_container {
-  position: relative; 
+#map3d {
   border: 1px solid silver; 
   width: 640px;
   height: 480px;
-}
-
-#map3d {  
-  height: 100%; 
-  width: 100%;
-  z-index: 10; 
 }
 
 .button { background-color: #D0D0D0; cursor: pointer; }

@@ -87,7 +87,7 @@ h2 {
   display: none;
 }
 
-#left-panel, #map3d_container {
+#left-panel, #map3d {
   height: 498px;
 }
 
@@ -153,16 +153,12 @@ h2 {
   /* leave room for a 2px border */
 }
 
-#map3d_container {
+#map3d {
   position: absolute;
   left: 300px;
   top: 0;
   border: 1px solid silver;
   width: 698px;
-}
-
-#map3d {
-  height: 100%;
 }
 
 #map3d h3 { /* balloon */
