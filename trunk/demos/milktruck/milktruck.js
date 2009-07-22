@@ -20,13 +20,30 @@ limitations under the License.
 window.truck = null;
 
 // Pull the Milktruck model from 3D Warehouse.
+var PAGE_PATH = document.location.href.replace(/\/[^\/]+$/, '/');
 var MODEL_URL =
   'http://sketchup.google.com/3dwarehouse/download?'
   + 'mid=3c9a1cac8c73c61b6284d71745f1efa9&rtyp=zip&'
   + 'fn=milktruck&ctyp=milktruck';
+var INIT_LOC = {
+  lat: 37.423501,
+  lon: -122.086744,
+  heading: 90
+}; // googleplex
 
+var PREVENT_START_AIRBORNE = false;
 var TICK_MS = 66;
 
+var BALLOON_FG = '#000000';
+var BALLOON_BG = '#FFFFFF';
+
+var GRAVITY = 9.8;
+var CAM_HEIGHT = 10;
+var TRAILING_DISTANCE = 50;
+
+var ACCEL = 50.0;
+var DECEL = 80.0;
+var MAX_REVERSE_SPEED = 40.0;
 
 var STEER_ROLL = -1.0;
 var ROLL_SPRING = 0.5;
@@ -75,10 +92,13 @@ function Truck() {
 Truck.prototype.finishInit = function(kml) {
   var me = this;
 
-  // The model zip file is actually a kmz, containing a KmlFolder with
-  // a camera KmlPlacemark (we don't care) and a model KmlPlacemark
-  // (our milktruck).
-  me.placemark = kml.getFeatures().getChildNodes().item(1);
+  walkKmlDom(kml, function() {
+    if (this.getType() == 'KmlPlacemark' &&
+        this.getGeometry() &&
+        this.getGeometry().getType() == 'KmlModel')
+      me.placemark = this;
+  });
+
   me.model = me.placemark.getGeometry();
   me.orientation = me.model.getOrientation();
   me.location = me.model.getLocation();
@@ -91,21 +111,22 @@ Truck.prototype.finishInit = function(kml) {
 
   me.balloon = ge.createHtmlStringBalloon('');
   me.balloon.setFeature(me.placemark);
-  me.balloon.setMaxWidth(200);
+  me.balloon.setMaxWidth(350);
+  me.balloon.setForegroundColor(BALLOON_FG);
+  me.balloon.setBackgroundColor(BALLOON_BG);
 
-  me.teleportTo(37.423501, -122.086744, 90);  // Looking at the 'Plex
+  me.teleportTo(INIT_LOC.lat, INIT_LOC.lon, INIT_LOC.heading);
 
   me.lastMillis = (new Date()).getTime();
 
   var href = window.location.href;
-  var pagePath = href.substring(0, href.lastIndexOf('/')) + '/';
 
   me.shadow = ge.createGroundOverlay('');
   me.shadow.setVisibility(false);
   me.shadow.setIcon(ge.createIcon(''));
   me.shadow.setLatLonBox(ge.createLatLonBox(''));
   me.shadow.setAltitudeMode(ge.ALTITUDE_CLAMP_TO_SEA_FLOOR);
-  me.shadow.getIcon().setHref(pagePath + 'shadowrect.png');
+  me.shadow.getIcon().setHref(PAGE_PATH + 'shadowrect.png');
   me.shadow.setVisibility(true);
   ge.getFeatures().appendChild(me.shadow);
 
@@ -267,9 +288,6 @@ Truck.prototype.tick = function() {
     me.vel = V3.sub(me.vel, V3.scale(right, slip * (1 - c0)));
 
     // Apply engine/reverse accelerations.
-    var ACCEL = 50.0;
-    var DECEL = 80.0;
-    var MAX_REVERSE_SPEED = 40.0;
     forwardSpeed = V3.dot(dir, me.vel);
     if (gasButtonDown) {
       // Accelerate forwards.
@@ -312,7 +330,7 @@ Truck.prototype.tick = function() {
   }
 
   // Gravity
-  me.vel[2] -= 9.8 * dt;
+  me.vel[2] -= GRAVITY * dt;
 
   // Move.
   var deltaPos = V3.scale(me.vel, dt);
@@ -517,11 +535,8 @@ Truck.prototype.cameraFollow = function(dt, truckPos, localToGlobalFrame) {
   var heading = camHeading + c1 * deltaHeading;
   heading = fixAngle(heading);
 
-  var TRAILING_DISTANCE = 50;
   var headingRadians = heading / 180 * Math.PI;
   
-  var CAM_HEIGHT = 10;
-
   var headingDir = V3.rotate(localToGlobalFrame[1], localToGlobalFrame[2],
                              -headingRadians);
   var camPos = V3.add(truckPos, V3.scale(localToGlobalFrame[2], CAM_HEIGHT));
@@ -556,6 +571,16 @@ Truck.prototype.teleportTo = function(lat, lon, heading) {
   me.pos = [0, 0, ge.getGlobe().getGroundAltitude(lat, lon)];
 
   me.cameraCut();
+
+  // make sure to not start airborne
+  if (PREVENT_START_AIRBORNE) {
+    window.setTimeout(function() {
+      var groundAlt = ge.getGlobe().getGroundAltitude(lat, lon);
+      var airborne = (groundAlt + 0.30 < me.pos[2]);
+      if (airborne)
+        me.teleportTo(lat, lon, heading);
+    }, 500);
+  }
 };
 
 // Move our anchor closer to our current position.  Retain our global
