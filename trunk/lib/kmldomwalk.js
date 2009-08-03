@@ -1,4 +1,8 @@
-// kmldomwalk.js
+// DEPRECATED:
+//   see http://code.google.com/p/earth-api-utility-library
+//
+//   specifically GEarthExtensions#dom.walk
+
 /*
 Copyright 2008 Google Inc.
 

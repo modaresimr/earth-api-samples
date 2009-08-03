@@ -1,3 +1,6 @@
+// DEPRECATED:
+//   see http://code.google.com/p/earth-api-utility-library
+
 // geplugin-helpers.js
 // requires math3d.js
 
