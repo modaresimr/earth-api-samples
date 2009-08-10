@@ -92,6 +92,10 @@ function init() {
 
     var mapEntries = mapFeedRoot.feed.getEntries();
     for (var i = 0; i < mapEntries.length; i++) {
+      if (!mapEntries[i].getEditLink() ||
+          !mapEntries[i].getEditLink().href)
+        continue;
+
       var myMap = {
         id: mapEntries[i].getId().$t,
         title: mapEntries[i].getTitle().$t,
