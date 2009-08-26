@@ -273,6 +273,8 @@ function resize() {
 
   var topTable = document.getElementById('toptable');
   topTable.style.height = Math.max(20, Math.min(MAX_TOP_HEIGHT, height - MIN_BOTTOM_HEIGHT)) + 'px';
+  document.getElementById('map3d').style.height = topTable.style.height;
+  document.getElementById('log').style.height = topTable.style.height;
 
   stretchToBottom(el('samples'));
   stretchToBottom(el('sample_code'));
