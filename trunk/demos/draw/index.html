@@ -101,11 +101,16 @@ function onmousedown(event) {
 function failureCB(object) {
 }
 
+function outKml() {
+  document.getElementById('kml-out').value = doc.getKml();
+}
+
   </script>
 </head>
 <body onload='init()' id='body'>
   <div id='map3d' style='border: 1px solid silver; height: 600px; width: 600px;'></div>
   <br>
-  <input type=button onclick='javascript:alert(doc.getKml())' value='Show KML'>
+  <input type=button onclick="outKml()" value='Show KML'/><br>
+  <textarea id="kml-out" style="width: 100%; height: 300px;"></textarea>
 </body>
 </html>
