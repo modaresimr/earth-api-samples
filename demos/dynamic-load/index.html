@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <!--
+  Copyright 2009 Google Inc.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <head>
+    <title>Dynamically Loading the Earth API</title>
+    <script type="text/javascript">
+
+var ge = null;
+
+// Replace the key below below with your own API key, available at
+// http://code.google.com/apis/maps/signup.html
+var JSAPI_KEY = 'ABQIAAAAwbkbZLyhsmTCWXbTcjbgbRSzHs7K5SvaUdm8ua-Xxy_-' +
+                '2dYwMxQMhnagaawTo7L1FE1-amhuQxIlXw';
+
+function go() {
+  window._jsapiLoadCallback = function() {
+    
+    logStatus('JSAPI bootstrap loaded');
+
+    google.load("earth", "1", {
+      callback: function() {
+        
+        logStatus('Earth API loaded!');
+        
+        google.earth.createInstance("map3d", function(pluginInstance) {
+          
+          logStatus('Plugin instance created!');
+          
+          ge = pluginInstance;
+          ge.getWindow().setVisibility(true);
+        });
+      }
+    });
+  };
+  
+  var scriptNode = document.createElement('script');
+  scriptNode.src = 'http://www.google.com/jsapi?key=' + JSAPI_KEY +
+                   '&callback=_jsapiLoadCallback';
+  document.body.appendChild(scriptNode);
+}
+
+function logStatus(msg) {
+  document.getElementById('status').innerHTML += '<div>' + msg + '</div>';
+}
+
+    </script>
+  </head>
+  <body>
+    <div>
+      <h1>Dynamically Loading the Earth API</h1>
+      <input type="button" onclick="go();" value="Load the JSAPI bootstrap, Earth API, and create a plugin instance"/>
+      <div id="status" style="margin: 20px 0; padding: 10px; border: 1px solid blue; color: blue; background-color: #eef; width: 15em">
+      </div>
+    </div>
+
+    <div id="map3d" style="border: 1px solid silver; height: 300px; width: 400px;"></div>
+  </body>
+</html>
