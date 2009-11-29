@@ -133,6 +133,15 @@ Truck.prototype.finishInit = function(kml) {
   google.earth.addEventListener(ge, "frameend", function() { me.tick(); });
 
   me.cameraCut();
+
+  // Make sure keyboard focus starts out on the page.
+  ge.getWindow().blur();
+
+  // If the user clicks on the Earth window, try to restore keyboard
+  // focus back to the page.
+  google.earth.addEventListener(ge.getWindow(), "mouseup", function(event) {
+      ge.getWindow().blur();
+    });
 }
 
 leftButtonDown = false;
@@ -397,10 +406,6 @@ Truck.prototype.tick = function() {
   me.tickPopups(dt);
   
   me.cameraFollow(dt, gpos, me.localFrame);
-
-  // Hack to work around focus bug
-  // TODO: fix that bug and remove this hack.
-  ge.getWindow().blur();
 };
 
 // TODO: would be nice to have globe.getGroundNormal() in the API.
