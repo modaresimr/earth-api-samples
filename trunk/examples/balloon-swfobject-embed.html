@@ -1,0 +1,100 @@
+<!DOCTYPE html> 
+<html> 
+
+<head> 
+  <title>Oceans Example</title> 
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/> 
+  <!-- *** Replace the key below below with your own API key, available at http://code.google.com/apis/maps/signup.html *** -->
+  <script src="http://www.google.com/jsapi?key=ABQIAAAAwbkbZLyhsmTCWXbTcjbgbRSzHs7K5SvaUdm8ua-Xxy_-2dYwMxQMhnagaawTo7L1FE1-amhuQxIlXw"></script>
+
+
+  <script type="text/javascript" src="http://earth-api-utility-library.googlecode.com/files/extensions-0.2.pack.js"></script>
+  <script type="text/javascript">
+  
+    google.load("earth", "1");
+    google.load("swfobject", "2.1");
+    var ge;
+    var placemark;
+    var ytplayer;
+
+      
+    function init() {
+        google.earth.createInstance('map3d', initCB, failureCB);
+    }
+      
+      function initCB(instance) {
+        ge = instance;
+        ge.getWindow().setVisibility(true);
+
+         // Create the placemark and add it to Earth.
+         placemark = ge.createPlacemark('');
+
+         // Create style map for placemark
+         var icon = ge.createIcon('');
+         icon.setHref('http://maps.google.com/mapfiles/kml/paddle/red-circle.png');
+         var style = ge.createStyle('');
+         style.getIconStyle().setIcon(icon);
+         placemark.setStyleSelector(style);
+
+         // Set the placemark's location.
+         var point = ge.createPoint('');
+         point.setLatitude(40.756915);
+         point.setLongitude(-73.846496);
+         point.setAltitudeMode(ge.ALTITUDE_CLAMP_TO_GROUND);
+         placemark.setGeometry(point);
+
+         // Add the placemark to Earth.
+         ge.getFeatures().appendChild(placemark);
+
+         // Move the camera.
+         var la = ge.createLookAt('');
+         la.set(40.756915, -73.846496, 0, ge.ALTITUDE_RELATIVE_TO_GROUND, -8.541, 66.213, 1000);
+         ge.getView().setAbstractView(la);
+
+        var div = document.getElementById('vid_div');
+        
+         google.earth.addEventListener(placemark, 'click', function(event) {
+           var balloon = ge.createHtmlDivBalloon('');
+           balloon.setMaxWidth(450);
+           balloon.setContentDiv(div);
+           ge.setBalloon(balloon);
+           div.style.display = 'block';
+           loadPlayer();
+         });
+
+      }
+      
+   
+    function failureCB(errorCode) {
+        alert('you do not seem to have the plugin installed.. using gmaps instead')
+        }
+      
+
+    // The "main method" of this sample. Called when someone clicks "Run".
+    function loadPlayer(video_id) {
+        //console.log('balloonVideoDiv should be available.. ', document.getElementById('fooDiv'), '.. loading video')
+        if (!video_id) video_id = 'hbGhoiGgVQM';
+        // Lets Flash from another domain call JavaScript
+        var params = { allowScriptAccess: "always" };
+        // The element id of the Flash embed
+        var atts = { id: "ytPlayer" };
+        // All of the magic handled by SWFObject (http://code.google.com/p/swfobject/)
+        swfobject.embedSWF("http://www.youtube.com/v/" + video_id + 
+                         "&enablejsapi=1&playerapiid=player1&autoplay=1", 
+                         "fooDiv", "400", "295", "8", null, null, params, atts);
+
+        }
+        
+    </script>
+</head> 
+<body onload="init();"> 
+
+<div id="content">
+   <div id="map3d" style="border: 1px solid silver; width: 700px; height: 500px;"></div> 
+   <div id="vid_div" style="display:none; width:450px; height:350px; font-size:70%;"> 
+       <h1>Beatle's Concert at Shea Stadium 1965</h1>
+       <div id="fooDiv" width=400 height=295>loading video ...<br><br><br><br></div>
+   </div>
+</div> 
+</body> 
+</html> 
