@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!-- *** Replace the key below below with your own API key, available at http://code.google.com/apis/maps/signup.html *** -->
+  <script src="http://www.google.com/jsapi?key=ABQIAAAAwbkbZLyhsmTCWXbTcjbgbRSzHs7K5SvaUdm8ua-Xxy_-2dYwMxQMhnagaawTo7L1FE1-amhuQxIlXw"></script>
+
+
+  <link type="text/css" href="http://jqueryui.com/latest/themes/base/ui.all.css" rel="stylesheet" />
+  <script type="text/javascript" src="http://jqueryui.com/latest/jquery-1.3.2.js"></script>
+  <script type="text/javascript" src="http://jqueryui.com/latest/ui/ui.core.js"></script>
+  <script type="text/javascript" src="http://jqueryui.com/latest/ui/ui.tabs.js"></script>
+
+<script type="text/javascript">
+
+      var ge;
+      var placemark;
+
+      google.load("earth", "1");
+
+      function initialize() {
+         google.earth.createInstance('earth_div', initCB, failureCB);
+      }
+
+      function initCB(instance) {
+
+         ge = instance;
+         ge.getWindow().setVisibility(true);
+         ge.getNavigationControl().setVisibility(ge.VISIBILITY_SHOW);
+
+         // Create the placemark and add it to Earth.
+         placemark = ge.createPlacemark('');
+
+         // Create style map for placemark
+         var icon = ge.createIcon('');
+         icon.setHref('http://maps.google.com/mapfiles/kml/paddle/red-circle.png');
+         var style = ge.createStyle('');
+         style.getIconStyle().setIcon(icon);
+         placemark.setStyleSelector(style);
+
+         // Set the placemark's location.
+         var point = ge.createPoint('');
+         point.setLatitude(37.8103);
+         point.setLongitude(-122.3688);
+         point.setAltitudeMode(ge.ALTITUDE_CLAMP_TO_GROUND);
+         placemark.setGeometry(point);
+
+         // Add the placemark to Earth.
+         ge.getFeatures().appendChild(placemark);
+
+         // Move the camera.
+         var la = ge.createLookAt('');
+         la.set(37.8103, -122.3688, 0, ge.ALTITUDE_RELATIVE_TO_GROUND, -8.541, 66.213, 1000);
+         ge.getView().setAbstractView(la);
+
+         var div = document.getElementById('tabbox');
+         var balloon = ge.createHtmlDivBalloon('');
+
+         google.earth.addEventListener(placemark, 'click', function(event) {
+           balloon.setContentDiv(div);
+           ge.setBalloon(balloon);
+           $("#tabs").tabs();
+           div.style.display = 'block';
+         });
+      }
+
+      function failureCB(errorCode) {
+      }
+
+ </script>
+</head>
+<body style="font-size:100%;" onload="initialize()">
+  <div id="earth_div" style="width:600px;height:400px;"></div>
+  <div id="tabbox" style="display:none; font-size:70%; width:250px;height:120px;">
+  <div id="tabs">
+     <ul>
+     <li><a href="#fragment-1"><span>One</span></a></li>
+     <li><a href="#fragment-2"><span>Two</span></a></li>
+     <li><a href="#fragment-3"><span>Three</span></a></li>
+     </ul>
+     <div id="fragment-1">
+     <p><b>This is tab one</b></p>
+     </div>
+     <div id="fragment-2">
+     <p><i>You clicked tab 2<i></p>
+     </div>
+     <div id="fragment-3">
+     <p>Now on tab three</p>
+     </div>
+     </div>
+  </div>
+</body>
+</html>
