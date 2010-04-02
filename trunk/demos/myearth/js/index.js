@@ -219,10 +219,6 @@ function loadMap(mapId) {
     for (var i = 0; i < featureEntries.length; i++) {
       // preprocessing/cleanup
       var kml = featureEntries[i].getContent().$t || '';
-      kml = kml.replace(/<(kml\:)?href>\/mapfiles\//g,
-                        '<$1href>http://maps.google.com/mapfiles/');
-      kml = '<kml xmlns:kml="http://www.opengis.net/kml/2.2">' + kml +
-          '</kml>';
     
       var feature = {
         id: featureEntries[i].getId().$t,
