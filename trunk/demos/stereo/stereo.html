@@ -218,12 +218,12 @@ adjustTableSize = function() {
     Options:
     <input type=button value="Toggle Buildings" onclick="toggleBuildings(ge1);
     toggleBuildings(ge2);">
-    Stereoscopic Angle: <input type=text value="2.5" size=4 onChange='updateView();' name="angle" id="angle">
+    Stereoscopic Angle: <input type=text value="2.5" size=4 onChange='updateView(ge1,ge2);' name="angle" id="angle">
     Frame Width (clunky in FF): <input type=text value="800" size=4 name="tablewidth"
     id="tablewidth">
     Height: <input type=text value="500" size=4 name="tableheight"
     id="tableheight">
-    <input type=button value="Apply" onclick="adjustTableSize();updateView();">
+    <input type=button value="Apply" onclick="adjustTableSize();updateView(ge1,ge2);">
     <br>
     Presets:
     <input type=button value="Mt. St. Helens" onclick="warpStHelens();">
