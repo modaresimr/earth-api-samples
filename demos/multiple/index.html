@@ -93,9 +93,9 @@ function configureEarths() {
   var earths = el('earths');
   earths.innerHTML = "<table>" +
     mapns(function(row) {
-        return "<tr>" + 
+        return "<tr>" +
           mapns(function(col) {
-            return "<td width=" + earthWidth + ">" + 
+            return "<td width=" + earthWidth + ">" +
               "  <div id='" + getEarthContainerDivName(row, col) +
                 "' style='border: 1px solid silver; height: " +
                 earthHeight + "px;'>" +
@@ -171,12 +171,12 @@ function geDo(f) {
 
 function goToLocation(address) {
   geocoder.getLatLng(
-    address, 
+    String(address),
     function(point) {
       if (point && ge != null)
         geDo(function(ge) {
           var la = ge.createLookAt('');
-          la.set(point.y, point.x, 100, ge.ALTITUDE_RELATIVE_TO_GROUND, 
+          la.set(point.y, point.x, 100, ge.ALTITUDE_RELATIVE_TO_GROUND,
                  0, 0, 4000);
           ge.getView().setAbstractView(la);
         });
