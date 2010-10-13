@@ -60,6 +60,7 @@ google.setOnLoadCallback(function() {
         g_ge.getLayerRoot().enableLayerById(g_ge.LAYER_BUILDINGS, true);
         
         dijit.byId('load-button').setDisabled(false);
+        checkAutoload();
       },
       function() {
         g_earthDisabled = true;
@@ -67,6 +68,36 @@ google.setOnLoadCallback(function() {
       });
   });
 });
+
+// If the user supplied a kml url as a CGI param, load it now.
+function checkAutoload() {
+  if (window.location.search.length > 1) {
+    // Parse CGI params.
+    var args = window.location.search.substring(1);
+    var params = {};
+    var pairs = args.split('&');
+    for (var i = 0; i < pairs.length; i++) {
+      var p = pairs[i].split('=');
+      if (p.length > 1) {
+        params[decodeURIComponent(p[0])] = decodeURIComponent(p[1]);
+      }
+    }
+
+    if ('kml' in params) {
+      var url = params['kml'];
+      if (url.length > 0) {
+        dijit.byId('kml-url').setValue(url);
+        loadKml();
+      }
+    }
+  }
+}
+
+function setPermalink(url) {
+  var link = window.location.toString();
+  link = link.split('?')[0] + '?kml=' + encodeURIComponent(url);
+  document.getElementById('permalink').href = link;
+}
 
 var g_treeIdObjectMap = null;
 
@@ -203,6 +234,7 @@ function expandTree() {
 
 function loadKml() {
   var url = dijit.byId('kml-url').getValue();
+  setPermalink(url);
   
   google.earth.fetchKml(g_ge, url, function(kmlObject) {
     if (!kmlObject) {
@@ -241,6 +273,7 @@ function flyToFeature(kmlFeature) {
       <h1 style="margin:0; padding:0">Earth API - KML DOM Tree</h1>
       <input id="kml-url" dojoType="dijit.form.TextBox" value="http://code.google.com/apis/kml/documentation/KML_Samples.kml"/>
       <button id="load-button" dojoType="dijit.form.Button" onclick="loadKml();">Load KML or KMZ</button>
+      <a id="permalink" href="">permalink</a>
     </div>
     
     <div id="left" dojoType="dijit.layout.ContentPane" region="left"
