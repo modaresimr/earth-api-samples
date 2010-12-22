@@ -1176,8 +1176,8 @@ function _beginCreateFeature(featureType) {
           placemark.getGeometry() :
           placemark.getGeometry().getOuterBoundary();
       
-      placemark.getGeometry().setAltitudeMode(g_ge.ALTITUDE_CLAMP_TO_SEA_FLOOR);
-      geom.setAltitudeMode(g_ge.ALTITUDE_CLAMP_TO_SEA_FLOOR);
+      placemark.getGeometry().setAltitudeMode(g_ge.ALTITUDE_CLAMP_TO_GROUND);
+      geom.setAltitudeMode(g_ge.ALTITUDE_CLAMP_TO_GROUND);
       geom.setTessellate(true);
       
       g_gex.edit.drawLineString(geom, {
