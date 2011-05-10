@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
+<Document>
+	<name>KmlFile</name>
+	<Style id="polystyle">
+		<LineStyle>
+			<color>ffff6d00</color>
+			<width>5</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>7affb417</color>
+		</PolyStyle>
+	</Style>
+	<Placemark>
+		<name>moscone</name>
+		<styleUrl>#polystyle</styleUrl>
+		<Polygon>
+			<tessellate>1</tessellate>
+			<outerBoundaryIs>
+				<LinearRing>
+					<coordinates>
+						-122.4029528897471,37.78323902317369,0 -122.4039265176256,37.78381607539928,0 -122.4050326258087,37.78296449841103,0 -122.4048427229712,37.78283964161379,0 -122.4049484774947,37.78273548032881,0 -122.4043914989601,37.78230001428116,0 -122.4043447392224,37.78224823414305,0 -122.4036203014871,37.7826809473699,0 -122.4029528897471,37.78323902317369,0 
+					</coordinates>
+				</LinearRing>
+			</outerBoundaryIs>
+		</Polygon>
+	</Placemark>
+</Document>
+</kml>
