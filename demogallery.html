@@ -83,7 +83,7 @@ function updateGallery() {
   var htmlAll = ['<br/>Showing ' + (min + 1) + ' - ' + max + ' of ' + feed.entry.length];
   var topic = document.getElementById('topicdropdown').value;
   var searchTerm = document.getElementById('searchbox').value;
-  var searchLink = 'http://code.google.com/apis/earth/documentation/demogallery.html' + '?searchquery=' + searchTerm + '&topic=' + topic;
+  var searchLink = 'https://developers.google.com/earth/documentation/demogallery' + '?searchquery=' + searchTerm + '&topic=' + topic;
   htmlAll.push('  (<a href="' + searchLink + '" target="_blank">Link to this search</a>)');
   htmlAll.push('<table><tbody>');
   for (var i = min; i < max; i++) {
@@ -201,7 +201,7 @@ function cm_getJSON(preferSearch) {
   } catch(err) {
   }
   var script = document.createElement('script');
-  script.setAttribute('src', 'http://spreadsheets.google.com/feeds/list/pekCIUp4X0pTOCT5YGYb8TQ/od6/public/values' +
+  script.setAttribute('src', '//spreadsheets.google.com/feeds/list/pekCIUp4X0pTOCT5YGYb8TQ/od6/public/values' +
                         queryAndSort + 
                         '&alt=json-in-script&callback=cm_loadSamplesJSON');
   script.setAttribute('id', 'jsonScript');
